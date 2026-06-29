@@ -12,6 +12,15 @@ interface SessionState {
 
 const SessionContext = createContext<SessionState | undefined>(undefined);
 
+// Evita que una llamada colgada (red lenta/token expirado) deje la app
+// atorada en el spinner: si tarda demasiado, rechaza y seguimos.
+function conTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+  ]);
+}
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
@@ -23,31 +32,42 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     try {
-      setPerfil(await obtenerPerfil());
+      setPerfil(await conTimeout(obtenerPerfil(), 8000));
     } catch {
       setPerfil({ rol: null });
     }
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      setSession(data.session);
-      await cargarPerfil(data.session);
-      setCargando(false);
-    });
+    let activo = true;
+
+    (async () => {
+      try {
+        const { data } = await conTimeout(supabase.auth.getSession(), 8000);
+        if (!activo) return;
+        setSession(data.session);
+        await cargarPerfil(data.session);
+      } catch {
+        // Si falla, dejamos sesión en null -> pantalla de login.
+      } finally {
+        if (activo) setCargando(false);
+      }
+    })();
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, s) => {
       setSession(s);
       await cargarPerfil(s);
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      activo = false;
+      sub.subscription.unsubscribe();
+    };
   }, [cargarPerfil]);
 
-  // Recarga el perfil usando la sesión actual del cliente Supabase (no la
-  // del closure), útil tras el registro cuando la fila cliente se acaba de crear.
+  // Recarga el perfil usando la sesión actual del cliente Supabase.
   const recargarPerfil = useCallback(async () => {
     try {
-      setPerfil(await obtenerPerfil());
+      setPerfil(await conTimeout(obtenerPerfil(), 8000));
     } catch {
       setPerfil({ rol: null });
     }
