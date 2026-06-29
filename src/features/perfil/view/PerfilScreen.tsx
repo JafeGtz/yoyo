@@ -88,7 +88,7 @@ export function PerfilScreen() {
 
       <AppText variant="subtitle" style={styles.seccion}>Cuenta</AppText>
       <SoftCard style={styles.grupo}>
-        <Fila icono="👤" label="Datos personales" />
+        <Fila icono="👤" label="Datos personales" onPress={() => navigation.navigate('EditarPerfil')} />
         <Divisor />
         <Fila icono="🔒" label="Privacidad" />
       </SoftCard>
@@ -107,13 +107,13 @@ export function PerfilScreen() {
   );
 }
 
-function Fila({ icono, label }: { icono: string; label: string }) {
+function Fila({ icono, label, onPress }: { icono: string; label: string; onPress?: () => void }) {
   return (
-    <View style={styles.fila}>
+    <Pressable style={styles.fila} onPress={onPress} disabled={!onPress}>
       <AppText variant="body" style={styles.filaIcono}>{icono}</AppText>
       <AppText variant="body" style={styles.flex}>{label}</AppText>
       <AppText variant="body" color={colors.textSecondary}>›</AppText>
-    </View>
+    </Pressable>
   );
 }
 

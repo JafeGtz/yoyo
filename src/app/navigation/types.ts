@@ -5,5 +5,6 @@ export type ConsumidorStackParams = {
   Insignias: undefined;
   Notificaciones: undefined;
   Referidos: undefined;
+  EditarPerfil: undefined;
   Resena: { negocioId: string; nombre: string };
 };
