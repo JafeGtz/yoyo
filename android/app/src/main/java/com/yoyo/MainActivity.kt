@@ -1,11 +1,21 @@
 package com.yoyo
 
+import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
+
+  /**
+   * react-native-screens requiere pasar null a super.onCreate para evitar
+   * crashes al restaurar el Fragment manager de Android.
+   * https://reactnavigation.org/docs/troubleshooting/#app-crashes-when-using-react-native-screens
+   */
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(null)
+  }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
