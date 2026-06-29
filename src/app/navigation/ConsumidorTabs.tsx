@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { MisNegociosScreen } from '../../features/misNegocios/view/MisNegociosScreen';
 import { EscanearScreen } from '../../features/escanear/view/EscanearScreen';
 import { MisBeneficiosScreen } from '../../features/misBeneficios/view/MisBeneficiosScreen';
@@ -9,12 +9,16 @@ import { TabBar } from './TabBar';
 
 const Tab = createBottomTabNavigator();
 
+// Wrapper a nivel de módulo: React Navigation llama tabBar() como función,
+// así que TabBar debe renderizarse como elemento JSX (no pasarse directo),
+// de lo contrario sus hooks (useSafeAreaInsets) lanzan "Invalid hook call".
+function renderTabBar(props: BottomTabBarProps) {
+  return <TabBar {...props} />;
+}
+
 export function ConsumidorTabs() {
   return (
-    <Tab.Navigator
-      tabBar={TabBar}
-      screenOptions={{ headerShown: false }}
-    >
+    <Tab.Navigator tabBar={renderTabBar} screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Inicio" component={MisNegociosScreen} />
       <Tab.Screen name="Beneficios" component={MisBeneficiosScreen} />
       <Tab.Screen name="Escanear" component={EscanearScreen} />
