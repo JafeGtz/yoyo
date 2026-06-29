@@ -114,6 +114,29 @@ export function DetalleNegocioScreen() {
         </Card>
       )}
 
+      {/* Ranking del mes */}
+      {d.ranking.length > 0 && (
+        <>
+          <SectionHeader titulo="Top del mes" />
+          <SoftCard>
+            {d.ranking.map((r, i) => {
+              const yo = r.cliente_id === (perfil?.cliente_id ?? '');
+              return (
+                <View key={r.cliente_id} style={[styles.rankFila, i > 0 && styles.divisor]}>
+                  <AppText variant="subtitle" color={yo ? colors.primary : colors.textSecondary} style={styles.rankPos}>
+                    {i + 1}
+                  </AppText>
+                  <AppText variant="body" style={styles.flex} color={yo ? colors.primary : colors.textPrimary}>
+                    {yo ? 'Tú' : r.nombre}
+                  </AppText>
+                  <AppText variant="caption" color={colors.textSecondary}>{r.visitas} visitas</AppText>
+                </View>
+              );
+            })}
+          </SoftCard>
+        </>
+      )}
+
       {/* Catálogo */}
       {d.catalogo.length > 0 && (
         <>
@@ -182,4 +205,7 @@ const styles = StyleSheet.create({
   info: { marginTop: spacing.lg },
   historialFila: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: spacing.sm },
   divisor: { borderTopWidth: 1, borderTopColor: colors.border },
+  rankFila: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm },
+  rankPos: { width: 28 },
 });
+
