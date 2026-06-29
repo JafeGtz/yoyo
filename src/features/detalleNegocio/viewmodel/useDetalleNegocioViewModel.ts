@@ -20,6 +20,7 @@ export interface DetalleNegocio {
   visitas: { id: string; creado_en: string; monto: number | null }[];
   catalogo: { id: string; nombre: string; descripcion: string | null; precio: number | null }[];
   ranking: { cliente_id: string; nombre: string; visitas: number }[];
+  tieneRuleta: boolean;
 }
 
 type UiState =
@@ -36,13 +37,14 @@ export function useDetalleNegocioViewModel(negocioId: string, clienteId: string)
     const ahora = new Date();
     const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1).toISOString();
 
-    const [neg, cn, bens, vis, cat, rank] = await Promise.all([
+    const [neg, cn, bens, vis, cat, rank, ruleta] = await Promise.all([
       supabase.from('negocio').select('id, nombre, tipo, descripcion, direccion, telefono, logo_url, lat, lng').eq('id', negocioId).single(),
       supabase.from('cliente_negocio').select('visitas_totales, monto_acumulado, nivel:nivel_membresia_id(nombre)').eq('negocio_id', negocioId).eq('cliente_id', clienteId).maybeSingle(),
       supabase.from('beneficio_desbloqueado').select('id, vence_en, beneficio:beneficio_id(nombre)').eq('negocio_id', negocioId).eq('cliente_id', clienteId).eq('estado', 'disponible'),
       supabase.from('visita').select('id, creado_en, monto').eq('negocio_id', negocioId).eq('cliente_id', clienteId).order('creado_en', { ascending: false }).limit(10),
       supabase.from('catalogo_item').select('id, nombre, descripcion, precio').eq('negocio_id', negocioId).order('orden'),
       supabase.rpc('ranking_negocio', { p_negocio_id: negocioId, p_desde: inicioMes }),
+      supabase.from('premio_juego').select('id', { count: 'exact', head: true }).eq('negocio_id', negocioId).eq('juego', 'ruleta').eq('activo', true),
     ]);
 
     if (neg.error || !neg.data) {
@@ -64,6 +66,7 @@ export function useDetalleNegocioViewModel(negocioId: string, clienteId: string)
         visitas: (vis.data as { id: string; creado_en: string; monto: number | null }[]) ?? [],
         catalogo: (cat.data as { id: string; nombre: string; descripcion: string | null; precio: number | null }[]) ?? [],
         ranking: (rank.data as { cliente_id: string; nombre: string; visitas: number }[]) ?? [],
+        tieneRuleta: (ruleta.count ?? 0) > 0,
       },
     });
   }, [negocioId, clienteId]);

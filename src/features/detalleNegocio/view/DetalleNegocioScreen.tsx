@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Card, SoftCard } from '../../../shared/ui/Card';
@@ -16,7 +16,7 @@ import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 export function DetalleNegocioScreen() {
   const { params } = useRoute<RouteProp<ConsumidorStackParams, 'DetalleNegocio'>>();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
   const { perfil } = useSession();
   const { state } = useDetalleNegocioViewModel(params.negocioId, perfil?.cliente_id ?? '');
   const [usando, setUsando] = useState<{ id: string; nombre: string } | null>(null);
@@ -83,6 +83,16 @@ export function DetalleNegocioScreen() {
           </View>
         )}
       </HeroCard>
+
+      {/* Gira y Gana */}
+      {d.tieneRuleta && (
+        <AppButton
+          titulo="🎡 Gira y Gana"
+          variante="secundario"
+          style={styles.ruletaBtn}
+          onPress={() => navigation.navigate('Ruleta', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
+        />
+      )}
 
       {/* Beneficios disponibles */}
       {d.beneficios.length > 0 && (
@@ -207,5 +217,6 @@ const styles = StyleSheet.create({
   divisor: { borderTopWidth: 1, borderTopColor: colors.border },
   rankFila: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm },
   rankPos: { width: 28 },
+  ruletaBtn: { marginTop: spacing.md },
 });
 
