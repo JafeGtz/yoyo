@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ConsumidorTabs } from './ConsumidorTabs';
 import { DetalleNegocioScreen } from '../../features/detalleNegocio/view/DetalleNegocioScreen';
 import { InsigniasScreen } from '../../features/insignias/view/InsigniasScreen';
+import { ResenaScreen } from '../../features/resena/view/ResenaScreen';
 import type { ConsumidorStackParams } from './types';
 
 const Stack = createNativeStackNavigator<ConsumidorStackParams>();
@@ -13,6 +14,7 @@ export function ConsumidorStack() {
       <Stack.Screen name="Tabs" component={ConsumidorTabs} />
       <Stack.Screen name="DetalleNegocio" component={DetalleNegocioScreen} />
       <Stack.Screen name="Insignias" component={InsigniasScreen} />
+      <Stack.Screen name="Resena" component={ResenaScreen} options={{ presentation: 'modal' }} />
     </Stack.Navigator>
   );
 }

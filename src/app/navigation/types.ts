@@ -3,5 +3,5 @@ export type ConsumidorStackParams = {
   Tabs: undefined;
   DetalleNegocio: { negocioId: string; nombre: string };
   Insignias: undefined;
-  Resena: { canjeId: string; negocioId: string; nombre: string };
+  Resena: { negocioId: string; nombre: string };
 };

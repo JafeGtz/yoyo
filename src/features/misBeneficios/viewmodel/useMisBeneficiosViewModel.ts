@@ -5,6 +5,7 @@ export interface BeneficioDesbloqueado {
   id: string;
   estado: string;
   vence_en: string | null;
+  negocio_id: string;
   beneficio: { nombre: string; tipo: string } | null;
   negocio: { nombre: string } | null;
 }
@@ -25,7 +26,7 @@ export function useMisBeneficiosViewModel(clienteId: string) {
     setState({ status: 'cargando' });
     const { data, error } = await supabase
       .from('beneficio_desbloqueado')
-      .select('id, estado, vence_en, beneficio:beneficio_id(nombre, tipo), negocio:negocio_id(nombre)')
+      .select('id, estado, vence_en, negocio_id, beneficio:beneficio_id(nombre, tipo), negocio:negocio_id(nombre)')
       .eq('cliente_id', clienteId)
       .order('desbloqueado_en', { ascending: false });
     if (error) setState({ status: 'error', mensaje: error.message });

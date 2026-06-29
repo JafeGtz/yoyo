@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { SoftCard } from '../../../shared/ui/Card';
@@ -7,6 +8,7 @@ import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisBeneficiosViewModel } from '../viewmodel/useMisBeneficiosViewModel';
 import { CodigoCanjeModal } from './CodigoCanjeModal';
+import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 const ESTADO: Record<string, { texto: string; color: string }> = {
   disponible: { texto: 'Disponible', color: colors.mint },
@@ -18,6 +20,7 @@ const ESTADO: Record<string, { texto: string; color: string }> = {
 
 export function MisBeneficiosScreen() {
   const { perfil } = useSession();
+  const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
   const { state } = useMisBeneficiosViewModel(perfil?.cliente_id ?? '');
   const [usando, setUsando] = useState<{ id: string; nombre: string } | null>(null);
 
@@ -64,6 +67,13 @@ export function MisBeneficiosScreen() {
                   >
                     <AppText variant="caption" color="#fff" style={styles.estadoTexto}>Usar</AppText>
                   </Pressable>
+                ) : b.estado === 'canjeado' ? (
+                  <Pressable
+                    style={styles.calificar}
+                    onPress={() => navigation.navigate('Resena', { negocioId: b.negocio_id, nombre: b.negocio?.nombre ?? 'el negocio' })}
+                  >
+                    <AppText variant="caption" color={colors.primary} style={styles.estadoTexto}>★ Calificar</AppText>
+                  </Pressable>
                 ) : (
                   <View style={[styles.estado, { backgroundColor: est.color }]}>
                     <AppText variant="caption" color="#fff" style={styles.estadoTexto}>{est.texto}</AppText>
@@ -101,4 +111,5 @@ const styles = StyleSheet.create({
   estado: { borderRadius: radii.pill, paddingHorizontal: 10, paddingVertical: 4 },
   estadoTexto: { fontWeight: '700' },
   usar: { backgroundColor: colors.primary, borderRadius: radii.pill, paddingHorizontal: 16, paddingVertical: 8 },
+  calificar: { borderWidth: 1.5, borderColor: colors.primary, borderRadius: radii.pill, paddingHorizontal: 14, paddingVertical: 7 },
 });
