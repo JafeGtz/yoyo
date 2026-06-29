@@ -12,8 +12,6 @@ interface SessionState {
 
 const SessionContext = createContext<SessionState | undefined>(undefined);
 
-// Evita que una llamada colgada (red lenta/token expirado) deje la app
-// atorada en el spinner: si tarda demasiado, rechaza y seguimos.
 function conTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
     p,
@@ -21,81 +19,80 @@ function conTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   ]);
 }
 
+const dormir = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+/**
+ * Un intento de cargar el perfil.
+ *  - Devuelve un Perfil (incluso {rol:null}) si la consulta tuvo ÉXITO.
+ *  - Devuelve null si FALLÓ (red/token) -> caso transitorio, hay que reintentar.
+ * Distinguir ambos es la clave para no mostrar "sin perfil" mientras el token
+ * se refresca.
+ */
+async function intentarPerfil(): Promise<Perfil | null> {
+  try {
+    return await conTimeout(obtenerPerfil(), 6000);
+  } catch {
+    return null;
+  }
+}
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
   const [cargando, setCargando] = useState(true);
 
-  const cargarPerfil = useCallback(async (s: Session | null) => {
-    if (!s) {
-      setPerfil(null);
-      return;
+  // Reintenta en silencio mientras el token se refresca. Solo marca rol:null
+  // si tras agotar el tiempo no se pudo (problema real).
+  const cargarPerfilConReintentos = useCallback(async (maxMs = 12000) => {
+    const limite = Date.now() + maxMs;
+    while (Date.now() < limite) {
+      const p = await intentarPerfil();
+      if (p) {
+        setPerfil(p);
+        return;
+      }
+      await dormir(800);
     }
-    try {
-      setPerfil(await conTimeout(obtenerPerfil(), 8000));
-    } catch {
-      setPerfil({ rol: null });
-    }
+    setPerfil({ rol: null });
   }, []);
 
   useEffect(() => {
     let activo = true;
 
-    // Al iniciar con token expirado, el perfil puede fallar el primer intento
-    // mientras el token se refresca. Reintenta en silencio (mostrando el
-    // spinner, no el error) para ir directo al Home sin parpadeo.
-    async function cargarConReintentos(s: Session | null) {
+    (async () => {
+      let s: Session | null = null;
+      try {
+        s = (await conTimeout(supabase.auth.getSession(), 8000)).data.session;
+      } catch {
+        // sin sesión utilizable
+      }
+      if (!activo) return;
+      setSession(s);
+      if (s) await cargarPerfilConReintentos();
+      if (activo) setCargando(false);
+    })();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === 'INITIAL_SESSION') return; // lo maneja el bloque inicial
+      setSession(s);
       if (!s) {
         setPerfil(null);
         return;
       }
-      for (let i = 0; i < 3; i++) {
-        try {
-          const p = await conTimeout(obtenerPerfil(), 6000);
-          if (!activo) return;
-          if (p.rol) {
-            setPerfil(p);
-            return;
-          }
-        } catch {
-          // reintentar
-        }
-        await new Promise(r => setTimeout(r, 800));
-      }
-      if (activo) setPerfil({ rol: null });
-    }
-
-    (async () => {
-      try {
-        const { data } = await conTimeout(supabase.auth.getSession(), 8000);
-        if (!activo) return;
-        setSession(data.session);
-        await cargarConReintentos(data.session);
-      } catch {
-        // Si falla, dejamos sesión en null -> pantalla de login.
-      } finally {
-        if (activo) setCargando(false);
-      }
-    })();
-
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, s) => {
-      setSession(s);
-      await cargarPerfil(s);
+      // Cambios posteriores (login, refresh de token): solo actualiza en ÉXITO,
+      // nunca pone rol:null transitorio -> no parpadea la pantalla de error.
+      intentarPerfil().then(p => {
+        if (p) setPerfil(p);
+      });
     });
+
     return () => {
       activo = false;
       sub.subscription.unsubscribe();
     };
-  }, [cargarPerfil]);
+  }, [cargarPerfilConReintentos]);
 
-  // Recarga el perfil usando la sesión actual del cliente Supabase.
-  const recargarPerfil = useCallback(async () => {
-    try {
-      setPerfil(await conTimeout(obtenerPerfil(), 8000));
-    } catch {
-      setPerfil({ rol: null });
-    }
-  }, []);
+  const recargarPerfil = useCallback(() => cargarPerfilConReintentos(6000), [cargarPerfilConReintentos]);
 
   return (
     <SessionContext.Provider value={{ session, perfil, cargando, recargarPerfil }}>
