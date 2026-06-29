@@ -7,6 +7,7 @@ export interface NegocioDir {
   tipo: string;
   direccion: string | null;
   logo_url: string | null;
+  portada_url: string | null;
 }
 
 type UiState =
@@ -21,7 +22,7 @@ export function useDescubrirViewModel() {
     setState({ status: 'cargando' });
     const { data, error } = await supabase
       .from('negocio')
-      .select('id, nombre, tipo, direccion, logo_url')
+      .select('id, nombre, tipo, direccion, logo_url, portada_url')
       .eq('estado', 'activo')
       .order('nombre');
     if (error) setState({ status: 'error', mensaje: error.message });

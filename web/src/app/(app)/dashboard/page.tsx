@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getSesion } from '@/lib/session';
 import { Card, PageHeader } from '@/components/ui/Card';
 import { VisitasChart, TopBeneficiosChart } from './DashboardCharts';
+import { PortadaUploader } from './PortadaUploader';
 
 const diaKey = (d: Date) => d.toISOString().slice(0, 10);
 const diaCorto = (s: string) => s.slice(5); // MM-DD
@@ -34,7 +35,7 @@ export default async function DashboardPage() {
     supabase.from('beneficio').select('nombre, condicion_visitas').eq('negocio_id', negocioId).eq('estado', 'activo').not('condicion_visitas', 'is', null),
     supabase.from('cliente_negocio').select('visitas_totales').eq('negocio_id', negocioId),
     supabase.from('resena').select('estrellas, nps').eq('negocio_id', negocioId),
-    supabase.from('negocio').select('modelo_acumulacion').eq('id', negocioId).single(),
+    supabase.from('negocio').select('modelo_acumulacion, portada_url').eq('id', negocioId).single(),
   ]);
 
   const v = (visitas as { creado_en: string; monto: number | null }[]) ?? [];
@@ -145,6 +146,10 @@ export default async function DashboardPage() {
             <div className="mt-1 text-3xl font-semibold text-gray-900">{visitasMes}</div>
           </Card>
         )}
+      </div>
+
+      <div className="mt-4">
+        <PortadaUploader negocioId={negocioId} inicial={(neg as { portada_url: string | null } | null)?.portada_url ?? null} />
       </div>
     </div>
   );

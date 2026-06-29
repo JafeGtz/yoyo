@@ -5,7 +5,6 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { SoftCard } from '../../../shared/ui/Card';
 import { HeroCard } from '../../../shared/ui/HeroCard';
-import { Badge } from '../../../shared/ui/Badge';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { colors, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -13,33 +12,18 @@ import { cerrarSesion } from '../../../core/auth/authService';
 import { supabase } from '../../../data/supabase/supabaseClient';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
-const capitalizar = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 export function PerfilScreen() {
   const { perfil } = useSession();
   const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
-  const [puntos, setPuntos] = useState<number | null>(null);
-  const [nivel, setNivel] = useState('Bronce');
   const [insignias, setInsignias] = useState(0);
 
   useEffect(() => {
     if (!perfil?.cliente_id) return;
-    (async () => {
-      const { data } = await supabase
-        .from('cliente')
-        .select('puntos_globales, nivel_embajador')
-        .eq('id', perfil.cliente_id)
-        .single();
-      if (data) {
-        setPuntos(data.puntos_globales);
-        setNivel(capitalizar(data.nivel_embajador));
-      }
-      const { count } = await supabase
-        .from('insignia_obtenida')
-        .select('id', { count: 'exact', head: true })
-        .eq('cliente_id', perfil.cliente_id);
-      setInsignias(count ?? 0);
-    })();
+    supabase
+      .from('insignia_obtenida')
+      .select('id', { count: 'exact', head: true })
+      .eq('cliente_id', perfil.cliente_id)
+      .then(({ count }) => setInsignias(count ?? 0));
   }, [perfil?.cliente_id]);
 
   const accesos: { icono: string; label: string; valor?: string; destino?: keyof ConsumidorStackParams }[] = [
@@ -57,9 +41,8 @@ export function PerfilScreen() {
         <View style={styles.heroFila}>
           <View style={styles.flex}>
             <AppText variant="subtitle" color="#fff">{perfil?.nombre ?? 'Cliente'}</AppText>
-            <View style={styles.badge}><Badge label={`Embajador ${nivel}`} /></View>
-            <AppText variant="hero" color="#fff" style={styles.puntos}>
-              {(puntos ?? 0).toLocaleString('es-MX')} <AppText variant="body" color="rgba(255,255,255,0.8)">puntos</AppText>
+            <AppText variant="caption" color="rgba(255,255,255,0.85)" style={styles.heroSub}>
+              {insignias} insignia{insignias === 1 ? '' : 's'} ganada{insignias === 1 ? '' : 's'}
             </AppText>
           </View>
           <View style={styles.avatar}>
@@ -123,8 +106,7 @@ const styles = StyleSheet.create({
   hero: { marginTop: spacing.md },
   heroFila: { flexDirection: 'row', alignItems: 'center' },
   flex: { flex: 1 },
-  badge: { marginVertical: spacing.sm },
-  puntos: { fontSize: 30, lineHeight: 34 },
+  heroSub: { marginTop: spacing.xs },
   avatar: {
     width: 60, height: 60, borderRadius: 30,
     backgroundColor: 'rgba(255,255,255,0.2)',
