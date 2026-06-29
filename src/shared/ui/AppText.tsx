@@ -20,6 +20,7 @@ export function AppText({
 }
 
 const styles = StyleSheet.create({
+  hero: typography.hero,
   title: typography.title,
   subtitle: typography.subtitle,
   body: typography.body,

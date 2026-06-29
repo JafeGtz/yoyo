@@ -21,8 +21,6 @@ export const env: AppEnv = {
   supabaseUrl: 'https://gtqfomzmpypmlbiaygme.supabase.co',
   supabaseAnonKey:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cWZvbXptcHlwbWxiaWF5Z21lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MzAyNDksImV4cCI6MjA5ODAwNjI0OX0.xqXgf1ZETDyfq_CMCZWIMw-C4qXHFR2MTuFS0ZmDVE8',
-  // Sigue en true: el repositorio Supabase aún es un stub. Cambiar a false
-  // cuando NegocioRepositorySupabase esté implementado (necesita el cliente
-  // @supabase/supabase-js — ver supabase/README.md).
-  useMockData: true,
+  // Repositorios reales contra Supabase ya implementados.
+  useMockData: false,
 };

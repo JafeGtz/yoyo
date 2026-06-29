@@ -1,15 +1,61 @@
 import React from 'react';
-import { MisNegociosScreen } from '../../features/misNegocios/view/MisNegociosScreen';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useSession } from '../../core/auth/SessionProvider';
+import { colors } from '../../shared/theme';
+import { AppText } from '../../shared/ui/AppText';
+import { Screen } from '../../shared/ui/Screen';
+import { AuthFlow } from '../../features/auth/view/AuthFlow';
+import { ConsumidorTabs } from './ConsumidorTabs';
+import { EmpleadoScreen } from '../../features/empleado/view/EmpleadoScreen';
 
 /**
- * Navegación raíz. Por ahora renderiza una sola pantalla de muestra.
- *
- * Próximo paso (Épica 0 / F0-4): integrar React Navigation
- *   npm install @react-navigation/native @react-navigation/native-stack \
- *               react-native-screens react-native-safe-area-context
- * y definir el árbol: Auth (login/registro) → Tabs del cliente
- * (Inicio, Escanear, Beneficios, Perfil).
+ * Enruta según la sesión y el rol (mi_perfil):
+ *   sin sesión          → AuthFlow (login/registro)
+ *   consumidor          → tabs del consumidor
+ *   personal            → app de empleado (confirmar canjes)
+ *   dueño/admin         → mensaje (usan la web)
  */
 export function RootNavigator() {
-  return <MisNegociosScreen />;
+  const { session, perfil, cargando } = useSession();
+
+  if (cargando) {
+    return (
+      <View style={styles.centro}>
+        <ActivityIndicator color={colors.primary} size="large" />
+      </View>
+    );
+  }
+
+  if (!session) return <AuthFlow />;
+
+  switch (perfil?.rol) {
+    case 'consumidor':
+      return <ConsumidorTabs />;
+    case 'personal':
+      return <EmpleadoScreen />;
+    case 'dueno':
+    case 'admin':
+      return (
+        <Screen>
+          <View style={styles.centro}>
+            <AppText variant="subtitle">Cuenta de negocio</AppText>
+            <AppText color={colors.textSecondary} style={styles.texto}>
+              Administra tu negocio desde el panel web. Esta app es para clientes y personal.
+            </AppText>
+          </View>
+        </Screen>
+      );
+    default:
+      // Sesión sin perfil aún (p. ej. fila cliente en creación).
+      return (
+        <View style={styles.centro}>
+          <ActivityIndicator color={colors.primary} />
+        </View>
+      );
+  }
 }
+
+const styles = StyleSheet.create({
+  centro: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  texto: { textAlign: 'center', marginTop: 8 },
+});

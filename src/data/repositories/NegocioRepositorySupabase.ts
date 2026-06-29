@@ -1,34 +1,69 @@
-import { Result } from '../../core/result/Result';
+import { AppError } from '../../core/errors/AppError';
+import { err, ok, Result } from '../../core/result/Result';
 import { ProgresoNegocio } from '../../domain/entities/ProgresoNegocio';
 import { NegocioRepository } from '../../domain/repositories/NegocioRepository';
+import { supabase } from '../supabase/supabaseClient';
 
-/**
- * Implementación real contra Supabase. Stub por ahora.
- *
- * Para cablearla (Épica 0 / F0-1, F0-2):
- *   1. npm install @supabase/supabase-js react-native-url-polyfill \
- *                  @react-native-async-storage/async-storage
- *   2. Crear src/data/supabase/supabaseClient.ts (createClient con env).
- *   3. Implementar la consulta debajo (SELECT con JOIN, protegido por RLS
- *      sobre negocio_id) y mapear filas -> ProgresoNegocio.
- *   4. En src/core/config/env.ts poner useMockData = false.
- *
- * El contenedor DI (core/di/container.ts) ya elige esta clase cuando
- * useMockData es false, así que no hay que tocar dominio ni UI.
- */
-export class NegocioRepositorySupabase implements NegocioRepository {
-  async obtenerMisNegocios(
-    _clienteId: string,
-  ): Promise<Result<ProgresoNegocio[]>> {
-    // TODO: SELECT desde cliente_negocio JOIN negocio (RLS por negocio_id),
-    // calcular visitasParaProximoBeneficio según los beneficios activos.
-    throw new AppErrorNotImplemented();
-  }
+interface FilaCN {
+  visitas_totales: number;
+  negocio: { id: string; nombre: string; tipo: string; modelo_acumulacion: string } | null;
+  nivel: { nombre: string } | null;
 }
 
-class AppErrorNotImplemented extends Error {
-  constructor() {
-    super('NegocioRepositorySupabase aún no está implementado.');
-    this.name = 'NotImplemented';
+/** Implementación real contra Supabase (protegida por RLS). */
+export class NegocioRepositorySupabase implements NegocioRepository {
+  async obtenerMisNegocios(clienteId: string): Promise<Result<ProgresoNegocio[]>> {
+    const { data, error } = await supabase
+      .from('cliente_negocio')
+      .select(
+        'visitas_totales, negocio:negocio_id(id, nombre, tipo, modelo_acumulacion), nivel:nivel_membresia_id(nombre)',
+      )
+      .eq('cliente_id', clienteId);
+
+    if (error) return err(new AppError('UNKNOWN', error.message, error));
+
+    const filas = (data as unknown as FilaCN[]).filter(f => f.negocio);
+    const negocioIds = filas.map(f => f.negocio!.id);
+
+    // Próximo beneficio por negocio (siguiente umbral de visitas no alcanzado).
+    const proximos = new Map<string, { nombre: string; faltan: number }>();
+    if (negocioIds.length > 0) {
+      const { data: benes } = await supabase
+        .from('beneficio')
+        .select('negocio_id, nombre, condicion_visitas')
+        .in('negocio_id', negocioIds)
+        .eq('estado', 'activo')
+        .not('condicion_visitas', 'is', null);
+
+      for (const f of filas) {
+        const candidatos = (benes ?? [])
+          .filter(b => b.negocio_id === f.negocio!.id && b.condicion_visitas! > f.visitas_totales)
+          .sort((a, b) => a.condicion_visitas! - b.condicion_visitas!);
+        if (candidatos[0]) {
+          proximos.set(f.negocio!.id, {
+            nombre: candidatos[0].nombre,
+            faltan: candidatos[0].condicion_visitas! - f.visitas_totales,
+          });
+        }
+      }
+    }
+
+    const progreso: ProgresoNegocio[] = filas.map(f => {
+      const prox = proximos.get(f.negocio!.id);
+      return {
+        negocio: {
+          id: f.negocio!.id,
+          nombre: f.negocio!.nombre,
+          tipo: f.negocio!.tipo,
+          modeloAcumulacion: f.negocio!.modelo_acumulacion === 'plus' ? 'plus' : 'basico',
+        },
+        visitasTotales: f.visitas_totales,
+        nivelActual: f.nivel?.nombre ?? 'Sin nivel',
+        proximoBeneficio: prox?.nombre,
+        visitasParaProximoBeneficio: prox?.faltan,
+      };
+    });
+
+    return ok(progreso);
   }
 }

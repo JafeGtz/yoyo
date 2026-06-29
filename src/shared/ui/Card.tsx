@@ -1,19 +1,27 @@
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
-import { colors, spacing } from '../theme';
+import { cardShadow, colors, radii, spacing } from '../theme';
 
-/** Tarjeta base reutilizable. */
+/** Tarjeta blanca con sombra suave (estilo UI Kit). */
 export function Card({ style, ...rest }: ViewProps) {
   return <View {...rest} style={[styles.card, style]} />;
 }
 
+/** Tarjeta clara (lavanda-gris) sin sombra, para filas/listas. */
+export function SoftCard({ style, ...rest }: ViewProps) {
+  return <View {...rest} style={[styles.soft, style]} />;
+}
+
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderRadius: radii.xl,
     padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
+    ...cardShadow,
+  },
+  soft: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
+    padding: spacing.md,
   },
 });
