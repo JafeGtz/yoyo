@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { SoftCard } from '../../../shared/ui/Card';
@@ -10,11 +11,13 @@ import { colors, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { cerrarSesion } from '../../../core/auth/authService';
 import { supabase } from '../../../data/supabase/supabaseClient';
+import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 const capitalizar = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function PerfilScreen() {
   const { perfil } = useSession();
+  const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
   const [puntos, setPuntos] = useState<number | null>(null);
   const [nivel, setNivel] = useState('Bronce');
   const [insignias, setInsignias] = useState(0);
@@ -39,8 +42,8 @@ export function PerfilScreen() {
     })();
   }, [perfil?.cliente_id]);
 
-  const accesos = [
-    { icono: '🏅', label: 'Insignias', valor: String(insignias) },
+  const accesos: { icono: string; label: string; valor?: string; destino?: keyof ConsumidorStackParams }[] = [
+    { icono: '🏅', label: 'Insignias', valor: String(insignias), destino: 'Insignias' },
     { icono: '🏪', label: 'Mis negocios' },
     { icono: '🔔', label: 'Notificaciones' },
     { icono: '👥', label: 'Referidos' },
@@ -67,13 +70,19 @@ export function PerfilScreen() {
 
       <View style={styles.grid}>
         {accesos.map(a => (
-          <SoftCard key={a.label} style={styles.gridItem}>
-            <View style={styles.iconoCirculo}>
-              <AppText variant="subtitle">{a.icono}</AppText>
-            </View>
-            <AppText variant="caption" style={styles.gridLabel}>{a.label}</AppText>
-            {a.valor && <AppText variant="subtitle" color={colors.primary}>{a.valor}</AppText>}
-          </SoftCard>
+          <Pressable
+            key={a.label}
+            style={styles.gridWrap}
+            onPress={() => a.destino && navigation.navigate(a.destino as never)}
+          >
+            <SoftCard style={styles.gridItem}>
+              <View style={styles.iconoCirculo}>
+                <AppText variant="subtitle">{a.icono}</AppText>
+              </View>
+              <AppText variant="caption" style={styles.gridLabel}>{a.label}</AppText>
+              {a.valor && <AppText variant="subtitle" color={colors.primary}>{a.valor}</AppText>}
+            </SoftCard>
+          </Pressable>
         ))}
       </View>
 
@@ -122,7 +131,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.lg },
-  gridItem: { width: '47%', alignItems: 'center', paddingVertical: spacing.lg },
+  gridWrap: { width: '47%' },
+  gridItem: { alignItems: 'center', paddingVertical: spacing.lg },
   iconoCirculo: {
     width: 52, height: 52, borderRadius: 26, backgroundColor: colors.lavender,
     alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm,
