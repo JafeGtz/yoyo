@@ -45,7 +45,7 @@ export function PerfilScreen() {
   const accesos: { icono: string; label: string; valor?: string; destino?: keyof ConsumidorStackParams }[] = [
     { icono: '🏅', label: 'Insignias', valor: String(insignias), destino: 'Insignias' },
     { icono: '🏪', label: 'Mis negocios' },
-    { icono: '🔔', label: 'Notificaciones' },
+    { icono: '🔔', label: 'Notificaciones', destino: 'Notificaciones' },
     { icono: '👥', label: 'Referidos' },
   ];
 
