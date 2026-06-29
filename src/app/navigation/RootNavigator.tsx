@@ -5,7 +5,7 @@ import { colors } from '../../shared/theme';
 import { AppText } from '../../shared/ui/AppText';
 import { Screen } from '../../shared/ui/Screen';
 import { AuthFlow } from '../../features/auth/view/AuthFlow';
-import { ConsumidorTabs } from './ConsumidorTabs';
+import { ConsumidorStack } from './ConsumidorStack';
 import { EmpleadoScreen } from '../../features/empleado/view/EmpleadoScreen';
 
 /**
@@ -30,7 +30,7 @@ export function RootNavigator() {
 
   switch (perfil?.rol) {
     case 'consumidor':
-      return <ConsumidorTabs />;
+      return <ConsumidorStack />;
     case 'personal':
       return <EmpleadoScreen />;
     case 'dueno':

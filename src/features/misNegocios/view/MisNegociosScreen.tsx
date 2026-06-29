@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Card } from '../../../shared/ui/Card';
@@ -11,6 +12,7 @@ import { colors, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { supabase } from '../../../data/supabase/supabaseClient';
 import { useMisNegociosViewModel } from '../viewmodel/useMisNegociosViewModel';
+import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 const TIERS: [number, string][] = [
   [5000, 'Diamante'], [1500, 'Platino'], [500, 'Oro'], [100, 'Plata'], [0, 'Bronce'],
@@ -25,6 +27,7 @@ function siguienteTier(puntos: number) {
 
 export function MisNegociosScreen() {
   const { perfil } = useSession();
+  const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
   const { state } = useMisNegociosViewModel(perfil?.cliente_id ?? '');
   const [puntos, setPuntos] = useState(0);
   const [nivel, setNivel] = useState('Bronce');
@@ -82,7 +85,11 @@ export function MisNegociosScreen() {
           const umbral = n.visitasTotales + (n.visitasParaProximoBeneficio ?? 0);
           const prog = umbral > 0 ? n.visitasTotales / umbral : 1;
           return (
-            <Card key={n.negocio.id} style={styles.negocio}>
+            <Pressable
+              key={n.negocio.id}
+              onPress={() => navigation.navigate('DetalleNegocio', { negocioId: n.negocio.id, nombre: n.negocio.nombre })}
+            >
+            <Card style={styles.negocio}>
               <View style={styles.negocioFila}>
                 <View style={styles.flex}>
                   <AppText variant="subtitle">{n.negocio.nombre}</AppText>
@@ -104,6 +111,7 @@ export function MisNegociosScreen() {
                   : 'Sin beneficios próximos'}
               </AppText>
             </Card>
+            </Pressable>
           );
         })}
     </Screen>
