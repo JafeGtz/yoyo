@@ -41,12 +41,36 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let activo = true;
 
+    // Al iniciar con token expirado, el perfil puede fallar el primer intento
+    // mientras el token se refresca. Reintenta en silencio (mostrando el
+    // spinner, no el error) para ir directo al Home sin parpadeo.
+    async function cargarConReintentos(s: Session | null) {
+      if (!s) {
+        setPerfil(null);
+        return;
+      }
+      for (let i = 0; i < 3; i++) {
+        try {
+          const p = await conTimeout(obtenerPerfil(), 6000);
+          if (!activo) return;
+          if (p.rol) {
+            setPerfil(p);
+            return;
+          }
+        } catch {
+          // reintentar
+        }
+        await new Promise(r => setTimeout(r, 800));
+      }
+      if (activo) setPerfil({ rol: null });
+    }
+
     (async () => {
       try {
         const { data } = await conTimeout(supabase.auth.getSession(), 8000);
         if (!activo) return;
         setSession(data.session);
-        await cargarPerfil(data.session);
+        await cargarConReintentos(data.session);
       } catch {
         // Si falla, dejamos sesión en null -> pantalla de login.
       } finally {
