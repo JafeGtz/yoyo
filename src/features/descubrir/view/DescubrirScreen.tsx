@@ -15,7 +15,7 @@ export function DescubrirScreen() {
   const [q, setQ] = useState('');
   const [categoria, setCategoria] = useState<string | null>(null);
 
-  const negocios = state.status === 'listo' ? state.negocios : [];
+  const negocios = useMemo(() => (state.status === 'listo' ? state.negocios : []), [state]);
   const categorias = useMemo(() => [...new Set(negocios.map(n => n.tipo))], [negocios]);
 
   const filtrados = negocios.filter(n => {
