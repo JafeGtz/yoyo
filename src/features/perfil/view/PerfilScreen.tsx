@@ -46,7 +46,7 @@ export function PerfilScreen() {
     { icono: '🏅', label: 'Insignias', valor: String(insignias), destino: 'Insignias' },
     { icono: '🏪', label: 'Mis negocios' },
     { icono: '🔔', label: 'Notificaciones', destino: 'Notificaciones' },
-    { icono: '👥', label: 'Referidos' },
+    { icono: '👥', label: 'Referidos', destino: 'Referidos' },
   ];
 
   return (
