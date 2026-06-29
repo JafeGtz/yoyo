@@ -5,14 +5,23 @@ import { AppText } from '../../../shared/ui/AppText';
 import { AppInput } from '../../../shared/ui/AppInput';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { colors, spacing } from '../../../shared/theme';
+import { useSession } from '../../../core/auth/SessionProvider';
 import { useAuthViewModel } from '../viewmodel/useAuthViewModel';
 
 export function RegistroScreen({ irALogin }: { irALogin: () => void }) {
   const { cargando, error, registrar } = useAuthViewModel();
+  const { recargarPerfil } = useSession();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [celular, setCelular] = useState('');
   const [password, setPassword] = useState('');
+
+  async function onRegistrar() {
+    const ok = await registrar({ email, password, nombre, celular });
+    // El cliente se crea tras el signUp; recargamos el perfil para que la
+    // navegación detecte el rol 'consumidor' y deje de mostrar el spinner.
+    if (ok) await recargarPerfil();
+  }
 
   return (
     <Screen bg={colors.lavenderBg} scroll>
@@ -30,7 +39,7 @@ export function RegistroScreen({ irALogin }: { irALogin: () => void }) {
 
       {error && <AppText color={colors.danger} style={styles.error}>{error}</AppText>}
 
-      <AppButton titulo="Crear cuenta" onPress={() => registrar({ email, password, nombre, celular })} cargando={cargando} style={styles.boton} />
+      <AppButton titulo="Crear cuenta" onPress={onRegistrar} cargando={cargando} style={styles.boton} />
 
       <View style={styles.footer}>
         <AppText color={colors.textSecondary}>¿Ya tienes cuenta?  </AppText>

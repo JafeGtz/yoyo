@@ -43,7 +43,15 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, [cargarPerfil]);
 
-  const recargarPerfil = useCallback(() => cargarPerfil(session), [cargarPerfil, session]);
+  // Recarga el perfil usando la sesión actual del cliente Supabase (no la
+  // del closure), útil tras el registro cuando la fila cliente se acaba de crear.
+  const recargarPerfil = useCallback(async () => {
+    try {
+      setPerfil(await obtenerPerfil());
+    } catch {
+      setPerfil({ rol: null });
+    }
+  }, []);
 
   return (
     <SessionContext.Provider value={{ session, perfil, cargando, recargarPerfil }}>
