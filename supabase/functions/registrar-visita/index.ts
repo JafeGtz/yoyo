@@ -23,7 +23,7 @@ Deno.serve(async (req: Request) => {
     const uid = await getAuthUserId(req);
     if (!uid) return json({ error: 'no_autenticado' }, 401);
 
-    const { qr_token, lat, lng, monto } = await req.json();
+    const { qr_token, lat, lng, monto, codigo } = await req.json();
     if (!qr_token) return json({ error: 'falta_qr_token' }, 400);
 
     const admin = adminClient();
@@ -55,10 +55,37 @@ Deno.serve(async (req: Request) => {
 
     const { data: negocio } = await admin
       .from('negocio')
-      .select('id, lat, lng, radio_geocerca_m, modelo_acumulacion, estado')
+      .select('id, lat, lng, radio_geocerca_m, modelo_acumulacion, estado, seguridad_visita')
       .eq('id', negocioId).single();
     if (!negocio || negocio.estado === 'cancelado' || negocio.estado === 'suspendido') {
       return json({ error: 'negocio_no_disponible' }, 400);
+    }
+
+    // 2.5) Si el negocio exige código, validarlo y consumirlo (un uso).
+    if (negocio.seguridad_visita === 'codigo') {
+      const cod = String(codigo ?? '').trim();
+      if (!cod) return json({ error: 'falta_codigo_visita' }, 400);
+
+      const { data: cv } = await admin
+        .from('codigo_visita')
+        .select('id, usos, usos_max')
+        .eq('negocio_id', negocioId)
+        .eq('codigo', cod)
+        .gt('expira_en', new Date().toISOString())
+        .order('creado_en', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!cv || cv.usos >= cv.usos_max) return json({ error: 'codigo_invalido' }, 400);
+
+      // Consumo con bloqueo optimista (evita doble uso por escaneos simultáneos).
+      const { data: consumido } = await admin
+        .from('codigo_visita')
+        .update({ usos: cv.usos + 1 })
+        .eq('id', cv.id)
+        .eq('usos', cv.usos)
+        .select('id')
+        .maybeSingle();
+      if (!consumido) return json({ error: 'codigo_invalido' }, 409);
     }
 
     // 3) Antifraude: máximo 1 visita por cliente/negocio cada 24 h.
