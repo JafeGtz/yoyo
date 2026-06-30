@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
 import { Card, PageHeader } from '@/components/ui/Card';
+import { ConfigCitas } from './ConfigCitas';
+import { CalendarioSemana } from './CalendarioSemana';
 
 export interface Cita {
   id: string;
@@ -15,6 +17,16 @@ export interface Cita {
   cliente: { nombre: string } | null;
 }
 export interface ClienteOpcion { id: string; nombre: string }
+export type CitasModo = 'desactivado' | 'solicitud' | 'agenda';
+export interface AgendaConfig {
+  dias?: number[];
+  hora_inicio?: string;
+  hora_fin?: string;
+  duracion_min?: number;
+  descanso_inicio?: string;
+  descanso_fin?: string;
+  timezone?: string;
+}
 
 const COLOR: Record<string, string> = {
   pendiente: 'bg-yellow-100 text-yellow-700',
@@ -27,10 +39,14 @@ export function CitasClient({
   negocioId,
   inicial,
   clientes,
+  modoInicial,
+  configInicial,
 }: {
   negocioId: string;
   inicial: Cita[];
   clientes: ClienteOpcion[];
+  modoInicial: CitasModo;
+  configInicial: AgendaConfig;
 }) {
   const supabase = createClient();
   const [lista, setLista] = useState<Cita[]>(inicial);
@@ -39,6 +55,7 @@ export function CitasClient({
   const [cuando, setCuando] = useState('');
   const [duracion, setDuracion] = useState('30');
   const [error, setError] = useState<string | null>(null);
+  const [vista, setVista] = useState<'lista' | 'calendario'>('calendario');
 
   async function crear(e: React.FormEvent) {
     e.preventDefault();
@@ -72,6 +89,8 @@ export function CitasClient({
     <div>
       <PageHeader title="Agenda de citas" description="Reservas de tus clientes. Confirma, cancela o márcalas como completadas." />
 
+      <ConfigCitas negocioId={negocioId} modoInicial={modoInicial} configInicial={configInicial} />
+
       <Card className="mb-6">
         <h3 className="mb-3 font-medium text-gray-900">Agendar cita</h3>
         <form onSubmit={crear} className="grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end">
@@ -90,7 +109,17 @@ export function CitasClient({
         {clientes.length === 0 && <p className="mt-2 text-sm text-gray-400">Necesitas clientes registrados para agendar.</p>}
       </Card>
 
-      {lista.length === 0 ? (
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-medium text-gray-900">Citas</h3>
+        <div className="inline-flex rounded-lg border border-gray-200 p-0.5">
+          <button onClick={() => setVista('calendario')} className={`rounded-md px-3 py-1 text-sm ${vista === 'calendario' ? 'bg-indigo-600 text-white' : 'text-gray-600'}`}>Calendario</button>
+          <button onClick={() => setVista('lista')} className={`rounded-md px-3 py-1 text-sm ${vista === 'lista' ? 'bg-indigo-600 text-white' : 'text-gray-600'}`}>Lista</button>
+        </div>
+      </div>
+
+      {vista === 'calendario' ? (
+        <CalendarioSemana citas={lista} />
+      ) : lista.length === 0 ? (
         <p className="text-sm text-gray-500">No hay citas agendadas.</p>
       ) : (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -116,6 +145,9 @@ export function CitasClient({
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     {c.estado !== 'completada' && c.estado !== 'cancelada' && (
                       <>
+                        {c.estado === 'pendiente' && (
+                          <button onClick={() => cambiarEstado(c, 'confirmada')} className="mr-3 text-green-600 hover:underline">Confirmar</button>
+                        )}
                         <button onClick={() => cambiarEstado(c, 'completada')} className="mr-3 text-indigo-600 hover:underline">Completar</button>
                         <button onClick={() => cambiarEstado(c, 'cancelada')} className="text-red-600 hover:underline">Cancelar</button>
                       </>
