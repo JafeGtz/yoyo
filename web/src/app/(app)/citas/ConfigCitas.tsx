@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Card } from '@/components/ui/Card';
 import { Field, Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { ZONA_NEGOCIO } from '@/lib/zona';
 import type { CitasModo, AgendaConfig } from './CitasClient';
 
 const DIAS = [
@@ -54,6 +55,7 @@ export function ConfigCitas({
           hora_inicio: hIni,
           hora_fin: hFin,
           duracion_min: Number(dur),
+          timezone: configInicial.timezone ?? ZONA_NEGOCIO,
           ...(descIni && descFin ? { descanso_inicio: descIni, descanso_fin: descFin } : {}),
         }
       : {};
@@ -102,6 +104,7 @@ export function ConfigCitas({
             <Field label="Cierra"><Input type="time" value={hFin} onChange={e => setHFin(e.target.value)} /></Field>
             <Field label="Duración (min)"><Input type="number" min={5} step={5} value={dur} onChange={e => setDur(e.target.value)} /></Field>
           </div>
+          <p className="mt-2 text-xs text-gray-400">Las horas se interpretan en zona {ZONA_NEGOCIO.split('/')[1].replace('_', ' ')}.</p>
           <p className="mt-4 mb-2 text-sm font-medium text-gray-700">Descanso (opcional)</p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Field label="Desde"><Input type="time" value={descIni} onChange={e => setDescIni(e.target.value)} /></Field>

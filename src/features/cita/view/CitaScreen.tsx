@@ -7,6 +7,7 @@ import { AppButton } from '../../../shared/ui/AppButton';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { agendarCita, slotsDisponibles, solicitarCita } from '../../../data/services/citaService';
+import { horaEnZona, instanteEnZona } from '../../../shared/zona';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 const DUR_DEFAULT = 30;
@@ -19,9 +20,6 @@ for (let h = 8; h <= 20; h++) for (const m of [0, 30]) HORAS_SOLICITUD.push(`${p
 
 function fechaISO(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-function horaDeISO(iso: string) {
-  return new Date(iso).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 }
 
 export function CitaScreen() {
@@ -82,9 +80,9 @@ export function CitaScreen() {
         await agendarCita(params.negocioId, seleccion, servicio, DUR_DEFAULT);
       } else {
         const [h, m] = seleccion.split(':').map(Number);
-        const inicia = new Date(fechaSel);
-        inicia.setHours(h, m, 0, 0);
-        await solicitarCita(params.negocioId, perfil.cliente_id, servicio, inicia.toISOString(), DUR_DEFAULT);
+        // Interpreta el día/hora elegidos EN la zona del negocio (no la del dispositivo).
+        const inicia = instanteEnZona(fechaSel.getFullYear(), fechaSel.getMonth() + 1, fechaSel.getDate(), h, m);
+        await solicitarCita(params.negocioId, perfil.cliente_id, servicio, inicia, DUR_DEFAULT);
       }
       setExito(true);
     } catch (e) {
@@ -154,7 +152,7 @@ export function CitaScreen() {
       ) : (
         <View style={styles.horas}>
           {(esAgenda ? slots : horasSolicitud).map(item => {
-            const etiqueta = esAgenda ? horaDeISO(item) : item;
+            const etiqueta = esAgenda ? horaEnZona(item) : item;
             const activo = seleccion === item;
             return (
               <Pressable key={item} onPress={() => setSeleccion(item)}

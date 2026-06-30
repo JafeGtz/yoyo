@@ -7,6 +7,7 @@ import { Field, Input, Select } from '@/components/ui/Input';
 import { Card, PageHeader } from '@/components/ui/Card';
 import { ConfigCitas } from './ConfigCitas';
 import { CalendarioSemana } from './CalendarioSemana';
+import { fechaHoraEnZona, instanteDesdeWallClock } from '@/lib/zona';
 
 export interface Cita {
   id: string;
@@ -67,7 +68,7 @@ export function CitasClient({
         negocio_id: negocioId,
         cliente_id: clienteId,
         servicio: servicio || null,
-        inicia_en: new Date(cuando).toISOString(),
+        inicia_en: instanteDesdeWallClock(cuando),
         duracion_min: Number(duracion),
         estado: 'confirmada',
       })
@@ -136,7 +137,7 @@ export function CitasClient({
             <tbody className="divide-y divide-gray-100">
               {lista.map(c => (
                 <tr key={c.id}>
-                  <td className="px-4 py-3 text-gray-700">{new Date(c.inicia_en).toLocaleString('es-MX')}</td>
+                  <td className="px-4 py-3 text-gray-700">{fechaHoraEnZona(c.inicia_en)}</td>
                   <td className="px-4 py-3 text-gray-900">{c.cliente?.nombre ?? '—'}</td>
                   <td className="px-4 py-3 text-gray-600">{c.servicio ?? '—'}</td>
                   <td className="px-4 py-3">
