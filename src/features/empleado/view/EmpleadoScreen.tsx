@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -7,15 +7,34 @@ import { AppButton } from '../../../shared/ui/AppButton';
 import { QrScanner } from '../../../shared/ui/QrScanner';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { cerrarSesion } from '../../../core/auth/authService';
-import { canjearBeneficio, type ResultadoCanje } from '../../../data/services/canjeService';
+import { useSession } from '../../../core/auth/SessionProvider';
+import { canjearBeneficio, generarCodigoVisita, type ResultadoCanje } from '../../../data/services/canjeService';
 
 const FONDO = '#15131F';
 type Estado = 'escaneando' | 'procesando' | 'exito' | 'error';
 
 export function EmpleadoScreen() {
+  const { perfil } = useSession();
   const [estado, setEstado] = useState<Estado>('escaneando');
   const [resultado, setResultado] = useState<ResultadoCanje | null>(null);
   const [error, setError] = useState('');
+
+  // Código de visita (modo "con código").
+  const [codigoVisita, setCodigoVisita] = useState<string | null>(null);
+  const [generando, setGenerando] = useState(false);
+
+  async function generarCodigo() {
+    if (!perfil?.negocio_id) return;
+    setGenerando(true);
+    setCodigoVisita(null);
+    try {
+      const r = await generarCodigoVisita(perfil.negocio_id);
+      setCodigoVisita(r.codigo);
+    } catch {
+      setCodigoVisita('error');
+    }
+    setGenerando(false);
+  }
 
   async function onScan(codigo: string) {
     setEstado('procesando');
@@ -77,6 +96,31 @@ export function EmpleadoScreen() {
           <AppText variant="caption" color="rgba(255,255,255,0.8)" onPress={cerrarSesion}>Salir</AppText>
         </View>
       </SafeAreaView>
+
+      {/* Botón flotante: generar código de visita */}
+      {estado === 'escaneando' && (
+        <View style={styles.fab} pointerEvents="box-none">
+          <AppButton titulo={generando ? 'Generando…' : '🔢 Código de visita'} onPress={generarCodigo} cargando={generando} />
+        </View>
+      )}
+
+      {/* Modal con el código de visita generado */}
+      <Modal visible={codigoVisita != null} transparent animationType="fade" onRequestClose={() => setCodigoVisita(null)}>
+        <View style={styles.backdrop}>
+          <View style={styles.hoja}>
+            <AppText variant="subtitle">Código de visita</AppText>
+            <AppText variant="caption" color={colors.textSecondary} style={styles.hojaSub}>
+              Dáselo al cliente para que registre su visita (un solo uso, 5 min).
+            </AppText>
+            {codigoVisita === 'error' ? (
+              <AppText color={colors.danger}>No se pudo generar. Intenta de nuevo.</AppText>
+            ) : (
+              <AppText variant="hero" color={colors.primary} style={styles.codigoGrande}>{codigoVisita}</AppText>
+            )}
+            <AppButton titulo="Cerrar" variante="secundario" onPress={() => setCodigoVisita(null)} style={styles.botonClaro} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -98,4 +142,9 @@ const styles = StyleSheet.create({
   exitoTitulo: { marginTop: spacing.md },
   detalle: { alignItems: 'center', marginTop: spacing.lg, backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.lg, alignSelf: 'stretch' },
   botonClaro: { alignSelf: 'stretch', marginTop: spacing.xl },
+  fab: { position: 'absolute', left: spacing.lg, right: spacing.lg, bottom: spacing.xl },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  hoja: { backgroundColor: '#fff', borderRadius: radii.xl, padding: spacing.lg, alignItems: 'center', alignSelf: 'stretch' },
+  hojaSub: { textAlign: 'center', marginTop: spacing.xs, marginBottom: spacing.md },
+  codigoGrande: { fontSize: 56, letterSpacing: 8, marginVertical: spacing.sm },
 });
