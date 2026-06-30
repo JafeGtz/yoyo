@@ -21,6 +21,9 @@ export function LogrosSection({
   const [lista, setLista] = useState<Logro[]>(inicial);
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [edNombre, setEdNombre] = useState('');
+  const [edDesc, setEdDesc] = useState('');
 
   async function crear(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +37,25 @@ export function LogrosSection({
   async function eliminar(id: string) {
     await supabase.from('logro').delete().eq('id', id);
     setLista(lista.filter(l => l.id !== id));
+  }
+
+  function abrirEdicion(l: Logro) {
+    setEditandoId(l.id);
+    setEdNombre(l.nombre);
+    setEdDesc(l.descripcion ?? '');
+  }
+  async function guardarEdicion(id: string) {
+    if (!edNombre.trim()) return;
+    const { data } = await supabase
+      .from('logro')
+      .update({ nombre: edNombre, descripcion: edDesc || null })
+      .eq('id', id)
+      .select('id, nombre, descripcion')
+      .single();
+    if (data) {
+      setLista(lista.map(l => (l.id === id ? (data as Logro) : l)));
+      setEditandoId(null);
+    }
   }
 
   return (
@@ -60,9 +82,28 @@ export function LogrosSection({
       {lista.length > 0 && (
         <ul className="mt-3 divide-y divide-gray-100">
           {lista.map(l => (
-            <li key={l.id} className="flex items-center justify-between py-2 text-sm">
-              <span className="text-gray-800">{l.nombre}</span>
-              <button onClick={() => eliminar(l.id)} className="text-red-600 hover:underline">Eliminar</button>
+            <li key={l.id} className="py-2 text-sm">
+              {editandoId === l.id ? (
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-3 md:items-end">
+                  <Field label="Nombre"><Input value={edNombre} onChange={e => setEdNombre(e.target.value)} /></Field>
+                  <Field label="Descripción"><Input value={edDesc} onChange={e => setEdDesc(e.target.value)} /></Field>
+                  <div className="flex items-center gap-3 pb-2">
+                    <button onClick={() => guardarEdicion(l.id)} className="text-indigo-600 hover:underline">Guardar</button>
+                    <button onClick={() => setEditandoId(null)} className="text-gray-500 hover:underline">Cancelar</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-gray-800">{l.nombre}</span>
+                    {l.descripcion && <span className="ml-2 text-gray-400">· {l.descripcion}</span>}
+                  </div>
+                  <div className="whitespace-nowrap">
+                    <button onClick={() => abrirEdicion(l)} className="mr-3 text-gray-700 hover:underline">Editar</button>
+                    <button onClick={() => eliminar(l.id)} className="text-red-600 hover:underline">Eliminar</button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>

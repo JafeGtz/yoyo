@@ -77,6 +77,7 @@ export function BeneficiosClient({
   const supabase = createClient();
   const [lista, setLista] = useState<Beneficio[]>(inicial);
   const [f, setF] = useState({ ...vacio });
+  const [editandoId, setEditandoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
 
@@ -85,36 +86,70 @@ export function BeneficiosClient({
   const usaMonto = f.condicion_tipo === 'monto' || f.condicion_tipo === 'combinado';
 
   const numOrNull = (s: string) => (s.trim() === '' ? null : Number(s));
+  const SELECT =
+    'id, nombre, descripcion, tipo, condicion_tipo, condicion_visitas, condicion_monto, vigencia_dias, valor_estimado, stock_total, cupo_dia, requiere_reserva, estado, nivel_membresia_id';
 
-  async function crear(e: React.FormEvent) {
+  function editar(b: Beneficio) {
+    setEditandoId(b.id);
+    setError(null);
+    setF({
+      nombre: b.nombre,
+      descripcion: b.descripcion ?? '',
+      tipo: b.tipo,
+      condicion_tipo: b.condicion_tipo,
+      condicion_visitas: b.condicion_visitas?.toString() ?? '',
+      condicion_monto: b.condicion_monto?.toString() ?? '',
+      vigencia_dias: b.vigencia_dias.toString(),
+      valor_estimado: b.valor_estimado?.toString() ?? '',
+      stock_total: b.stock_total?.toString() ?? '',
+      cupo_dia: b.cupo_dia?.toString() ?? '',
+      requiere_reserva: b.requiere_reserva,
+      nivel_membresia_id: b.nivel_membresia_id ?? '',
+    });
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelar() {
+    setEditandoId(null);
+    setF({ ...vacio });
+    setError(null);
+  }
+
+  async function guardar(e: React.FormEvent) {
     e.preventDefault();
     setGuardando(true);
     setError(null);
-    const { data, error } = await supabase
-      .from('beneficio')
-      .insert({
-        negocio_id: negocioId,
-        nombre: f.nombre,
-        descripcion: f.descripcion || null,
-        tipo: f.tipo,
-        condicion_tipo: f.condicion_tipo,
-        condicion_visitas: usaVisitas ? numOrNull(f.condicion_visitas) : null,
-        condicion_monto: usaMonto ? numOrNull(f.condicion_monto) : null,
-        vigencia_dias: Number(f.vigencia_dias),
-        valor_estimado: numOrNull(f.valor_estimado),
-        stock_total: numOrNull(f.stock_total),
-        cupo_dia: numOrNull(f.cupo_dia),
-        requiere_reserva: f.requiere_reserva,
-        nivel_membresia_id: f.nivel_membresia_id || null,
-      })
-      .select(
-        'id, nombre, descripcion, tipo, condicion_tipo, condicion_visitas, condicion_monto, vigencia_dias, valor_estimado, stock_total, cupo_dia, requiere_reserva, estado, nivel_membresia_id',
-      )
-      .single();
-    if (error) setError(error.message);
-    else if (data) {
-      setLista([data as Beneficio, ...lista]);
-      setF({ ...vacio });
+    const payload = {
+      negocio_id: negocioId,
+      nombre: f.nombre,
+      descripcion: f.descripcion || null,
+      tipo: f.tipo,
+      condicion_tipo: f.condicion_tipo,
+      condicion_visitas: usaVisitas ? numOrNull(f.condicion_visitas) : null,
+      condicion_monto: usaMonto ? numOrNull(f.condicion_monto) : null,
+      vigencia_dias: Number(f.vigencia_dias),
+      valor_estimado: numOrNull(f.valor_estimado),
+      stock_total: numOrNull(f.stock_total),
+      cupo_dia: numOrNull(f.cupo_dia),
+      requiere_reserva: f.requiere_reserva,
+      nivel_membresia_id: f.nivel_membresia_id || null,
+    };
+
+    if (editandoId) {
+      const { data, error } = await supabase.from('beneficio').update(payload).eq('id', editandoId).select(SELECT).single();
+      if (error) setError(error.message);
+      else if (data) {
+        setLista(lista.map(x => (x.id === editandoId ? (data as Beneficio) : x)));
+        setEditandoId(null);
+        setF({ ...vacio });
+      }
+    } else {
+      const { data, error } = await supabase.from('beneficio').insert(payload).select(SELECT).single();
+      if (error) setError(error.message);
+      else if (data) {
+        setLista([data as Beneficio, ...lista]);
+        setF({ ...vacio });
+      }
     }
     setGuardando(false);
   }
@@ -135,7 +170,8 @@ export function BeneficiosClient({
       <PageHeader title="Beneficios" description="Configura los premios que tus clientes desbloquean." />
 
       <Card className="mb-6">
-        <form onSubmit={crear} className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <h3 className="mb-3 font-medium text-gray-900">{editandoId ? 'Editar beneficio' : 'Nuevo beneficio'}</h3>
+        <form onSubmit={guardar} className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="md:col-span-2">
             <Field label="Nombre">
               <Input value={f.nombre} onChange={e => set('nombre', e.target.value)} placeholder="Corte gratis" required />
@@ -196,9 +232,14 @@ export function BeneficiosClient({
 
           <div className="md:col-span-3">
             {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
-            <Button type="submit" disabled={guardando}>
-              {guardando ? 'Guardando…' : 'Agregar beneficio'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button type="submit" disabled={guardando}>
+                {guardando ? 'Guardando…' : editandoId ? 'Guardar cambios' : 'Agregar beneficio'}
+              </Button>
+              {editandoId && (
+                <button type="button" onClick={cancelar} className="text-sm text-gray-500 hover:underline">Cancelar</button>
+              )}
+            </div>
           </div>
         </form>
       </Card>
@@ -239,6 +280,7 @@ export function BeneficiosClient({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <button onClick={() => editar(b)} className="mr-3 text-gray-700 hover:underline">Editar</button>
                     <button onClick={() => alternarPausa(b)} className="mr-3 text-indigo-600 hover:underline">
                       {b.estado === 'activo' ? 'Pausar' : 'Activar'}
                     </button>
