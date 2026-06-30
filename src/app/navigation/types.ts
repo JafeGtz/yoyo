@@ -8,4 +8,5 @@ export type ConsumidorStackParams = {
   EditarPerfil: undefined;
   Ruleta: { negocioId: string; nombre: string };
   Resena: { negocioId: string; nombre: string };
+  Cita: { negocioId: string; nombre: string; modo: 'solicitud' | 'agenda' };
 };

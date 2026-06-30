@@ -8,6 +8,7 @@ import { ReferidosScreen } from '../../features/referidos/view/ReferidosScreen';
 import { EditarPerfilScreen } from '../../features/editarPerfil/view/EditarPerfilScreen';
 import { RuletaScreen } from '../../features/ruleta/view/RuletaScreen';
 import { ResenaScreen } from '../../features/resena/view/ResenaScreen';
+import { CitaScreen } from '../../features/cita/view/CitaScreen';
 import type { ConsumidorStackParams } from './types';
 
 const Stack = createNativeStackNavigator<ConsumidorStackParams>();
@@ -23,6 +24,7 @@ export function ConsumidorStack() {
       <Stack.Screen name="EditarPerfil" component={EditarPerfilScreen} />
       <Stack.Screen name="Ruleta" component={RuletaScreen} />
       <Stack.Screen name="Resena" component={ResenaScreen} options={{ presentation: 'modal' }} />
+      <Stack.Screen name="Cita" component={CitaScreen} />
     </Stack.Navigator>
   );
 }

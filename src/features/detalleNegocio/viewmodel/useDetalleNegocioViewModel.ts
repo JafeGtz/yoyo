@@ -12,6 +12,7 @@ export interface DetalleNegocio {
     logo_url: string | null;
     lat: number | null;
     lng: number | null;
+    citas_modo: 'desactivado' | 'solicitud' | 'agenda';
   };
   visitasTotales: number;
   montoAcumulado: number;
@@ -38,7 +39,7 @@ export function useDetalleNegocioViewModel(negocioId: string, clienteId: string)
     const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1).toISOString();
 
     const [neg, cn, bens, vis, cat, rank, ruleta] = await Promise.all([
-      supabase.from('negocio').select('id, nombre, tipo, descripcion, direccion, telefono, logo_url, lat, lng').eq('id', negocioId).single(),
+      supabase.from('negocio').select('id, nombre, tipo, descripcion, direccion, telefono, logo_url, lat, lng, citas_modo').eq('id', negocioId).single(),
       supabase.from('cliente_negocio').select('visitas_totales, monto_acumulado, nivel:nivel_membresia_id(nombre)').eq('negocio_id', negocioId).eq('cliente_id', clienteId).maybeSingle(),
       supabase.from('beneficio_desbloqueado').select('id, vence_en, beneficio:beneficio_id(nombre)').eq('negocio_id', negocioId).eq('cliente_id', clienteId).eq('estado', 'disponible'),
       supabase.from('visita').select('id, creado_en, monto').eq('negocio_id', negocioId).eq('cliente_id', clienteId).order('creado_en', { ascending: false }).limit(10),

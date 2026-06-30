@@ -94,6 +94,19 @@ export function DetalleNegocioScreen() {
         />
       )}
 
+      {/* Agendar cita */}
+      {d.negocio.citas_modo !== 'desactivado' && (
+        <AppButton
+          titulo="📅 Agendar cita"
+          style={styles.ruletaBtn}
+          onPress={() => navigation.navigate('Cita', {
+            negocioId: d.negocio.id,
+            nombre: d.negocio.nombre,
+            modo: d.negocio.citas_modo as 'solicitud' | 'agenda',
+          })}
+        />
+      )}
+
       {/* Beneficios disponibles */}
       {d.beneficios.length > 0 && (
         <>
