@@ -36,9 +36,34 @@ export function MembresiasClient({
   const [caduca, setCaduca] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [edNombre, setEdNombre] = useState('');
+  const [edVisitas, setEdVisitas] = useState('0');
+  const [edCaduca, setEdCaduca] = useState(false);
 
   const beneficiosDe = (nivelId: string) =>
     beneficiosPorNivel.filter(b => b.nivel_membresia_id === nivelId);
+
+  function abrirEdicion(n: Nivel) {
+    setEditandoId(n.id);
+    setEdNombre(n.nombre);
+    setEdVisitas(String(n.visitas_minimas));
+    setEdCaduca(n.caduca_anual);
+  }
+  async function guardarEdicion(id: string) {
+    if (!edNombre.trim()) return;
+    const { data, error } = await supabase
+      .from('nivel_membresia')
+      .update({ nombre: edNombre, visitas_minimas: Number(edVisitas), caduca_anual: edCaduca })
+      .eq('id', id)
+      .select('id, nombre, visitas_minimas, orden, caduca_anual')
+      .single();
+    if (error) { setError(error.message); return; }
+    if (data) {
+      setLista(lista.map(x => (x.id === id ? (data as Nivel) : x)).sort((a, b) => a.visitas_minimas - b.visitas_minimas));
+      setEditandoId(null);
+    }
+  }
 
   async function crear(e: React.FormEvent) {
     e.preventDefault();
@@ -102,16 +127,29 @@ export function MembresiasClient({
             return (
               <Card key={n.id}>
                 <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-900">{n.nombre}</span>
-                      {n.caduca_anual && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
-                          caduca anual
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-0.5 text-sm text-gray-500">Desde {n.visitas_minimas} visitas</div>
+                  <div className="flex-1">
+                    {editandoId === n.id ? (
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
+                        <Field label="Nombre del nivel"><Input value={edNombre} onChange={e => setEdNombre(e.target.value)} /></Field>
+                        <Field label="Visitas mínimas"><Input type="number" min={0} value={edVisitas} onChange={e => setEdVisitas(e.target.value)} /></Field>
+                        <label className="flex items-center gap-2 pb-2 text-sm text-gray-700">
+                          <input type="checkbox" checked={edCaduca} onChange={e => setEdCaduca(e.target.checked)} />
+                          Caduca cada año
+                        </label>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-gray-900">{n.nombre}</span>
+                          {n.caduca_anual && (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                              caduca anual
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-0.5 text-sm text-gray-500">Desde {n.visitas_minimas} visitas</div>
+                      </>
+                    )}
                     <div className="mt-2">
                       <div className="text-xs font-medium uppercase tracking-wide text-gray-400">
                         Beneficios exclusivos
@@ -127,9 +165,19 @@ export function MembresiasClient({
                       )}
                     </div>
                   </div>
-                  <button onClick={() => eliminar(n)} className="text-sm text-red-600 hover:underline">
-                    Eliminar
-                  </button>
+                  <div className="ml-4 whitespace-nowrap">
+                    {editandoId === n.id ? (
+                      <>
+                        <button onClick={() => guardarEdicion(n.id)} className="mr-3 text-sm text-indigo-600 hover:underline">Guardar</button>
+                        <button onClick={() => setEditandoId(null)} className="text-sm text-gray-500 hover:underline">Cancelar</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={() => abrirEdicion(n)} className="mr-3 text-sm text-gray-700 hover:underline">Editar</button>
+                        <button onClick={() => eliminar(n)} className="text-sm text-red-600 hover:underline">Eliminar</button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </Card>
             );

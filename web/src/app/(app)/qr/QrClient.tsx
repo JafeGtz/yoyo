@@ -6,10 +6,20 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Card, PageHeader } from '@/components/ui/Card';
 
-export function QrClient({ negocioId }: { negocioId: string }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [codigoRespaldo, setCodigoRespaldo] = useState<string | null>(null);
-  const [expira, setExpira] = useState<string | null>(null);
+export function QrClient({
+  negocioId,
+  inicialToken = null,
+  inicialCodigo = null,
+  inicialExpira = null,
+}: {
+  negocioId: string;
+  inicialToken?: string | null;
+  inicialCodigo?: string | null;
+  inicialExpira?: string | null;
+}) {
+  const [token, setToken] = useState<string | null>(inicialToken);
+  const [codigoRespaldo, setCodigoRespaldo] = useState<string | null>(inicialCodigo);
+  const [expira, setExpira] = useState<string | null>(inicialExpira);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
