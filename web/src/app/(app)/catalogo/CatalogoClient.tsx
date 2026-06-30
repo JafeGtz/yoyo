@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
 import { Card, PageHeader } from '@/components/ui/Card';
+import { validarTamano } from '@/lib/imagen';
 
 export interface Categoria { id: string; nombre: string; orden: number }
 export interface Item {
@@ -69,6 +70,9 @@ export function CatalogoClient({
 
     let fotoUrl: string | null = null;
     if (foto) {
+      // Foto de producto cuadrada — mínimo 400×400.
+      const errImg = await validarTamano(foto, 400, 400);
+      if (errImg) { setError(`${errImg} Recomendado: 800×800 px (cuadrada).`); setGuardando(false); return; }
       const path = `${negocioId}/${Date.now()}-${foto.name}`;
       const { error: upErr } = await supabase.storage.from('catalogo').upload(path, foto);
       if (upErr) { setError('Error subiendo la foto: ' + upErr.message); setGuardando(false); return; }
@@ -146,7 +150,7 @@ export function CatalogoClient({
             </Select>
           </Field>
           <div className="md:col-span-2">
-            <Field label="Foto (opcional)">
+            <Field label="Foto (opcional) — recomendado cuadrada 800×800 px">
               <input type="file" accept="image/*" onChange={e => setFoto(e.target.files?.[0] ?? null)}
                 className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-indigo-700" />
             </Field>
