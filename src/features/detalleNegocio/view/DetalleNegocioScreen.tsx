@@ -94,6 +94,16 @@ export function DetalleNegocioScreen() {
         />
       )}
 
+      {/* Rasca y Gana */}
+      {d.tieneRasca && (
+        <AppButton
+          titulo="🪙 Rasca y Gana"
+          variante="secundario"
+          style={styles.ruletaBtn}
+          onPress={() => navigation.navigate('Rasca', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
+        />
+      )}
+
       {/* Agendar cita */}
       {d.negocio.citas_modo !== 'desactivado' && (
         <AppButton

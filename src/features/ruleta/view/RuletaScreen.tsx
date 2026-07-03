@@ -10,6 +10,13 @@ import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 type Estado = 'listo' | 'girando' | 'resultado';
 
+const ERRORES: Record<string, string> = {
+  sin_premios: 'Este negocio aún no configuró la ruleta.',
+  nivel_insuficiente: 'Este juego es solo para cierto nivel de clientes.',
+  sin_giros: 'Ya jugaste hoy. Vuelve mañana.',
+  no_cliente: 'Inicia sesión como cliente para jugar.',
+};
+
 export function RuletaScreen() {
   const { params } = useRoute<RouteProp<ConsumidorStackParams, 'Ruleta'>>();
   const navigation = useNavigation();
@@ -17,6 +24,7 @@ export function RuletaScreen() {
   const vueltas = useRef(0);
   const [estado, setEstado] = useState<Estado>('listo');
   const [premio, setPremio] = useState<string | null>(null);
+  const [detalle, setDetalle] = useState('');
   const [error, setError] = useState('');
 
   async function girar() {
@@ -37,10 +45,11 @@ export function RuletaScreen() {
       useNativeDriver: true,
     }).start(() => {
       if (e || data?.error) {
-        setError(data?.error === 'sin_premios' ? 'Este negocio aún no configuró la ruleta.' : 'No se pudo girar. Intenta de nuevo.');
+        setError(ERRORES[data?.error as string] ?? 'No se pudo girar. Intenta de nuevo.');
         setEstado('listo');
       } else {
         setPremio(data.premio);
+        setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'El premio se agotó, ¡sigue participando!' : '');
         setEstado('resultado');
       }
     });
@@ -72,6 +81,7 @@ export function RuletaScreen() {
             <AppText variant="hero">🎉</AppText>
             <AppText variant="title" color={colors.primary}>¡Ganaste!</AppText>
             <AppText variant="subtitle">{premio}</AppText>
+            {detalle ? <AppText variant="caption" color={colors.textSecondary} style={styles.sub}>{detalle}</AppText> : null}
           </View>
         )}
         {error ? <AppText color={colors.danger} style={styles.error}>{error}</AppText> : null}

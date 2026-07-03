@@ -7,6 +7,8 @@ import { NotificacionesScreen } from '../../features/notificaciones/view/Notific
 import { ReferidosScreen } from '../../features/referidos/view/ReferidosScreen';
 import { EditarPerfilScreen } from '../../features/editarPerfil/view/EditarPerfilScreen';
 import { RuletaScreen } from '../../features/ruleta/view/RuletaScreen';
+import { RascaScreen } from '../../features/rasca/view/RascaScreen';
+import { PremioPopup } from '../../features/premios/view/PremioPopup';
 import { ResenaScreen } from '../../features/resena/view/ResenaScreen';
 import { CitaScreen } from '../../features/cita/view/CitaScreen';
 import type { ConsumidorStackParams } from './types';
@@ -15,6 +17,7 @@ const Stack = createNativeStackNavigator<ConsumidorStackParams>();
 
 export function ConsumidorStack() {
   return (
+    <>
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Tabs" component={ConsumidorTabs} />
       <Stack.Screen name="DetalleNegocio" component={DetalleNegocioScreen} />
@@ -23,8 +26,11 @@ export function ConsumidorStack() {
       <Stack.Screen name="Referidos" component={ReferidosScreen} />
       <Stack.Screen name="EditarPerfil" component={EditarPerfilScreen} />
       <Stack.Screen name="Ruleta" component={RuletaScreen} />
+      <Stack.Screen name="Rasca" component={RascaScreen} />
       <Stack.Screen name="Resena" component={ResenaScreen} options={{ presentation: 'modal' }} />
       <Stack.Screen name="Cita" component={CitaScreen} />
     </Stack.Navigator>
+    <PremioPopup />
+    </>
   );
 }
