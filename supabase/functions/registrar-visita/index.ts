@@ -145,7 +145,7 @@ Deno.serve(async (req: Request) => {
     // 7) Desbloquear beneficios cuya condición se cumple y aún no se tienen.
     const { data: beneficios } = await admin
       .from('beneficio')
-      .select('id, nombre, condicion_tipo, condicion_visitas, condicion_monto, vigencia_dias')
+      .select('id, nombre, condicion_tipo, condicion_visitas, condicion_monto, vigencia_dias, stock_total')
       .eq('negocio_id', negocioId).eq('estado', 'activo');
 
     const desbloqueados: { id: string; nombre: string }[] = [];
@@ -163,6 +163,23 @@ Deno.serve(async (req: Request) => {
         .select('id', { count: 'exact', head: true })
         .eq('cliente_id', cliente.id).eq('beneficio_id', b.id);
       if ((ya ?? 0) > 0) continue;
+
+      // Hueco 1: si el beneficio tiene stock, solo se desbloquea (reserva) si aún
+      // quedan unidades. Disponibles = stock - reservados(no vencidos) - canjeados.
+      // Los vencidos no cuentan como reservados => se liberan solos (Hueco 6).
+      if (b.stock_total != null) {
+        const nowIso = new Date().toISOString();
+        const { count: reservados } = await admin
+          .from('beneficio_desbloqueado')
+          .select('id', { count: 'exact', head: true })
+          .eq('beneficio_id', b.id).eq('estado', 'disponible').gt('vence_en', nowIso);
+        const { count: canjeados } = await admin
+          .from('beneficio_desbloqueado')
+          .select('id', { count: 'exact', head: true })
+          .eq('beneficio_id', b.id).eq('estado', 'canjeado');
+        const disponibles = b.stock_total - (reservados ?? 0) - (canjeados ?? 0);
+        if (disponibles <= 0) continue; // agotado: no se desbloquea
+      }
 
       const vence = new Date(Date.now() + (b.vigencia_dias ?? 30) * 86400000).toISOString();
       const { data: nuevo } = await admin.from('beneficio_desbloqueado').insert({

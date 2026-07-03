@@ -46,6 +46,10 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
     if (!miembro) return json({ error: 'no_autorizado' }, 403);
 
+    // Beneficio (incluye costo, que se congela en el canje — Hueco 4).
+    const { data: beneficio } = await admin
+      .from('beneficio').select('nombre, tipo, valor_estimado').eq('id', bd.beneficio_id).single();
+
     // 4) Marcar canjeado + registrar canje (idempotente por unique en canje).
     const { error: updErr } = await admin
       .from('beneficio_desbloqueado')
@@ -57,6 +61,8 @@ Deno.serve(async (req: Request) => {
       beneficio_desbloqueado_id: bd.id,
       negocio_id: bd.negocio_id,
       cliente_id: bd.cliente_id,
+      beneficio_id: bd.beneficio_id,
+      costo: beneficio?.valor_estimado ?? null,
       validado_por: miembro.id,
       metodo: 'qr',
       codigo_temporal: jti,
@@ -64,8 +70,6 @@ Deno.serve(async (req: Request) => {
     if (canjeErr) return json({ error: canjeErr.message }, 400);
 
     // Datos para mostrar confirmación al personal.
-    const { data: beneficio } = await admin
-      .from('beneficio').select('nombre, tipo').eq('id', bd.beneficio_id).single();
     const { data: cliente } = await admin
       .from('cliente').select('nombre').eq('id', bd.cliente_id).single();
 
