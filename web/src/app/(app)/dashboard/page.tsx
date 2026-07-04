@@ -87,21 +87,28 @@ export default async function DashboardPage() {
   const ticketProm = montos.length ? montos.reduce((s, m) => s + m, 0) / montos.length : 0;
 
   const kpis = [
-    { label: 'Clientes', valor: clientes ?? 0 },
-    { label: 'Visitas hoy', valor: visitasHoy },
-    { label: 'Visitas (7 días)', valor: visitasSemana },
-    { label: 'Beneficios activos', valor: beneficiosActivos ?? 0 },
+    { label: 'Clientes', valor: clientes ?? 0, icon: '👥', grad: 'from-indigo-500 to-violet-500' },
+    { label: 'Visitas hoy', valor: visitasHoy, icon: '📍', grad: 'from-emerald-400 to-teal-500' },
+    { label: 'Visitas (7 días)', valor: visitasSemana, icon: '📈', grad: 'from-sky-400 to-blue-500' },
+    { label: 'Beneficios activos', valor: beneficiosActivos ?? 0, icon: '🎁', grad: 'from-amber-400 to-orange-500' },
   ];
 
   return (
     <div>
-      <PageHeader title="Dashboard" description={`Resumen de ${negocio!.nombre}`} />
+      <PageHeader icon="📊" title="Dashboard" description={`Resumen de ${negocio!.nombre}`} />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {kpis.map(k => (
-          <Card key={k.label}>
-            <div className="text-sm text-gray-500">{k.label}</div>
-            <div className="mt-1 text-3xl font-semibold text-gray-900">{k.valor}</div>
+          <Card key={k.label} hover>
+            <div className="flex items-center gap-3">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-xl shadow-sm ${k.grad}`}>
+                {k.icon}
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-medium text-gray-500">{k.label}</div>
+                <div className="text-2xl font-bold text-gray-900">{k.valor}</div>
+              </div>
+            </div>
           </Card>
         ))}
       </div>
@@ -109,8 +116,8 @@ export default async function DashboardPage() {
       {alertas.length > 0 && (
         <div className="mt-4 space-y-2">
           {alertas.map((a, i) => (
-            <div key={i} className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              ⚡ {a.texto} Prepárate.
+            <div key={i} className="flex items-start gap-2 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-4 py-3 text-sm text-amber-800">
+              <span className="text-base">⚡</span><span>{a.texto} Prepárate.</span>
             </div>
           ))}
         </div>
@@ -123,27 +130,27 @@ export default async function DashboardPage() {
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
-          <div className="text-sm text-gray-500">Calificación promedio</div>
-          <div className="mt-1 text-3xl font-semibold text-gray-900">
-            {promedio ? promedio.toFixed(1) : '—'} <span className="text-yellow-500">★</span>
+          <div className="flex items-center gap-2 text-sm text-gray-500"><span>⭐</span> Calificación promedio</div>
+          <div className="mt-1 text-3xl font-bold text-gray-900">
+            {promedio ? promedio.toFixed(1) : '—'} <span className="text-amber-400">★</span>
           </div>
           <div className="text-xs text-gray-400">{conEstrellas.length} reseñas</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-500">NPS</div>
-          <div className="mt-1 text-3xl font-semibold text-gray-900">{nps ?? '—'}</div>
+          <div className="flex items-center gap-2 text-sm text-gray-500"><span>💚</span> NPS</div>
+          <div className="mt-1 text-3xl font-bold text-gray-900">{nps ?? '—'}</div>
           <div className="text-xs text-gray-400">{conNps.length} respuestas</div>
         </Card>
         {esPlus ? (
           <Card>
-            <div className="text-sm text-gray-500">Ticket promedio</div>
-            <div className="mt-1 text-3xl font-semibold text-gray-900">${ticketProm.toFixed(0)}</div>
+            <div className="flex items-center gap-2 text-sm text-gray-500"><span>💳</span> Ticket promedio</div>
+            <div className="mt-1 text-3xl font-bold text-gray-900">${ticketProm.toFixed(0)}</div>
             <div className="text-xs text-gray-400">últimos 14 días</div>
           </Card>
         ) : (
           <Card>
-            <div className="text-sm text-gray-500">Visitas (30 días)</div>
-            <div className="mt-1 text-3xl font-semibold text-gray-900">{visitasMes}</div>
+            <div className="flex items-center gap-2 text-sm text-gray-500"><span>🗓️</span> Visitas (30 días)</div>
+            <div className="mt-1 text-3xl font-bold text-gray-900">{visitasMes}</div>
           </Card>
         )}
       </div>
