@@ -25,9 +25,10 @@ export default async function GamificacionPage() {
     { data: beneficios },
     { data: niveles },
     { data: configs },
+    { data: productos },
   ] = await Promise.all([
     supabase.from('negocio').select('config').eq('id', id).single(),
-    supabase.from('reto').select('id, nombre, descripcion, activo, vence_en, beneficio_id, tipo, meta').eq('negocio_id', id).order('creado_en', { ascending: false }),
+    supabase.from('reto').select('id, nombre, descripcion, activo, vence_en, beneficio_id, tipo, meta, catalogo_item_id').eq('negocio_id', id).order('creado_en', { ascending: false }),
     supabase.from('rifa').select('id, nombre, premio, cierra_en, estado, beneficio_id, criterio').eq('negocio_id', id).order('creado_en', { ascending: false }),
     supabase.from('premio_juego').select('id, juego, nombre, probabilidad, activo, beneficio_id').eq('negocio_id', id),
     supabase.from('logro').select('id, nombre, descripcion').eq('ambito', 'global').order('creado_en'),
@@ -35,6 +36,7 @@ export default async function GamificacionPage() {
     supabase.from('beneficio').select('id, nombre').eq('negocio_id', id).eq('estado', 'activo').order('nombre'),
     supabase.from('nivel_membresia').select('id, nombre, visitas_minimas').eq('negocio_id', id).order('visitas_minimas'),
     supabase.from('juego_config').select('juego, nivel_membresia_id, giros_max_dia').eq('negocio_id', id),
+    supabase.from('catalogo_item').select('id, nombre').eq('negocio_id', id).order('orden'),
   ]);
 
   const premiosRuleta = (premios ?? []).filter((p: { juego: string }) => p.juego === 'ruleta');
@@ -70,7 +72,7 @@ export default async function GamificacionPage() {
             </ol>
           )}
         </Card>
-        <RetosSection negocioId={id} inicial={retos ?? []} beneficios={bens} />
+        <RetosSection negocioId={id} inicial={retos ?? []} beneficios={bens} productos={(productos as { id: string; nombre: string }[]) ?? []} />
         <RifasSection negocioId={id} inicial={rifas ?? []} beneficios={bens} />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <JuegoSection negocioId={id} juego="ruleta" titulo='Ruleta "Gira y Gana"' inicial={premiosRuleta} beneficios={bens} niveles={nivs} config={cfgDe('ruleta')} />
