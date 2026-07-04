@@ -12,7 +12,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex">
       <Sidebar negocioNombre={negocio.nombre} />
-      <main className="h-screen flex-1 overflow-y-auto bg-gray-50 p-8">{children}</main>
+      <main className="h-screen flex-1 overflow-y-auto bg-gradient-to-b from-slate-50 via-white to-indigo-50/40">
+        <div className="mx-auto max-w-6xl p-6 md:p-8 animate-fade-up">{children}</div>
+      </main>
     </div>
   );
 }
