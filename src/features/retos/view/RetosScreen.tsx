@@ -15,9 +15,18 @@ interface RetoCliente {
   nombre: string;
   descripcion: string | null;
   meta: number;
+  tipo: string;
   premio: string | null;
   progreso: number;
   estado: string;
+}
+
+function progresoTexto(tipo: string, progreso: number, meta: number) {
+  const p = Math.min(progreso, meta);
+  if (tipo === 'monto') return `$${p} / $${meta}`;
+  if (tipo === 'racha') return `${p} / ${meta} días seguidos`;
+  if (tipo === 'referidos') return `${p} / ${meta} amigos`;
+  return `${p} / ${meta} visitas`;
 }
 
 export function RetosScreen() {
@@ -33,15 +42,15 @@ export function RetosScreen() {
     (async () => {
       const [{ data: retos }, { data: prog }] = await Promise.all([
         supabase.from('reto')
-          .select('id, nombre, descripcion, meta, beneficio:beneficio_id(nombre)')
+          .select('id, nombre, descripcion, meta, tipo, beneficio:beneficio_id(nombre)')
           .eq('negocio_id', params.negocioId).eq('activo', true),
         supabase.from('reto_progreso').select('reto_id, progreso, estado').eq('cliente_id', cid),
       ]);
       if (!vivo) return;
       const mapa = new Map((prog ?? []).map((p: { reto_id: string; progreso: number; estado: string }) => [p.reto_id, p]));
-      const rows = (retos as unknown as { id: string; nombre: string; descripcion: string | null; meta: number; beneficio: { nombre: string } | null }[] ?? [])
+      const rows = (retos as unknown as { id: string; nombre: string; descripcion: string | null; meta: number; tipo: string; beneficio: { nombre: string } | null }[] ?? [])
         .map(r => ({
-          id: r.id, nombre: r.nombre, descripcion: r.descripcion, meta: r.meta ?? 1,
+          id: r.id, nombre: r.nombre, descripcion: r.descripcion, meta: r.meta ?? 1, tipo: r.tipo ?? 'visitas',
           premio: r.beneficio?.nombre ?? null,
           progreso: mapa.get(r.id)?.progreso ?? 0,
           estado: mapa.get(r.id)?.estado ?? 'en_progreso',
@@ -79,7 +88,7 @@ export function RetosScreen() {
               <View style={styles.prog}>
                 <ProgressBar valor={valor} />
                 <AppText variant="caption" color={colors.textSecondary} style={styles.progTexto}>
-                  {Math.min(r.progreso, r.meta)} / {r.meta} visitas
+                  {progresoTexto(r.tipo, r.progreso, r.meta)}
                 </AppText>
               </View>
               {r.premio ? (
