@@ -11,10 +11,35 @@ Deno.serve(async (req: Request) => {
     const uid = await getAuthUserId(req);
     if (!uid) return json({ error: 'no_autenticado' }, 401);
 
-    const { negocio_id, juego } = await req.json();
+    const { negocio_id, juego, preview } = await req.json();
     if (!negocio_id || !juego) return json({ error: 'faltan_datos' }, 400);
 
     const admin = adminClient();
+
+    // Premios activos (necesarios en ambos modos).
+    const { data: premios } = await admin
+      .from('premio_juego')
+      .select('id, nombre, probabilidad, beneficio_id')
+      .eq('negocio_id', negocio_id).eq('juego', juego).eq('activo', true);
+    if (!premios || premios.length === 0) return json({ error: 'sin_premios' }, 400);
+
+    const elegir = () => {
+      const total = premios.reduce((s, p) => s + Number(p.probabilidad), 0) || premios.length;
+      let r = Math.random() * total;
+      let sel = premios[premios.length - 1];
+      for (const p of premios) { r -= Number(p.probabilidad) || 0; if (r <= 0) { sel = p; break; } }
+      return sel;
+    };
+
+    // Modo PREVIEW: el dueño/personal prueba su config desde el SaaS.
+    // No requiere cliente, no valida nivel/giros, no entrega ni registra nada.
+    if (preview) {
+      const { data: miembro } = await admin
+        .from('usuario_negocio').select('id')
+        .eq('auth_user_id', uid).eq('negocio_id', negocio_id).eq('activo', true).maybeSingle();
+      if (!miembro) return json({ error: 'no_autorizado' }, 403);
+      return json({ premio: elegir().nombre, preview: true });
+    }
 
     // Cliente que juega.
     const { data: cli } = await admin.from('cliente').select('id').eq('auth_user_id', uid).maybeSingle();
@@ -56,18 +81,8 @@ Deno.serve(async (req: Request) => {
       .eq('negocio_id', negocio_id).eq('cliente_id', clienteId).eq('juego', juego).gte('creado_en', desde);
     if ((giros ?? 0) >= girosMax) return json({ error: 'sin_giros' }, 429);
 
-    // Premios activos.
-    const { data: premios } = await admin
-      .from('premio_juego')
-      .select('id, nombre, probabilidad, beneficio_id')
-      .eq('negocio_id', negocio_id).eq('juego', juego).eq('activo', true);
-    if (!premios || premios.length === 0) return json({ error: 'sin_premios' }, 400);
-
     // Selección ponderada por probabilidad.
-    const total = premios.reduce((s, p) => s + Number(p.probabilidad), 0) || premios.length;
-    let r = Math.random() * total;
-    let sel = premios[premios.length - 1];
-    for (const p of premios) { r -= Number(p.probabilidad) || 0; if (r <= 0) { sel = p; break; } }
+    const sel = elegir();
 
     // Si el premio mapea a un beneficio, se desbloquea (respeta stock).
     let bdId: string | null = null;

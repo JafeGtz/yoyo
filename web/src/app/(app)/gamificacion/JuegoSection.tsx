@@ -48,8 +48,8 @@ export function JuegoSection({
   async function probar() {
     setGirando(true);
     setResultado(null);
-    const { data, error } = await supabase.functions.invoke('girar-juego', { body: { negocio_id: negocioId, juego } });
-    setResultado(error || data?.error ? `Error: ${data?.error ?? 'sin premios'}` : `🎉 ${data.premio}${data.canjeable ? ' (ya en beneficios)' : ''}`);
+    const { data, error } = await supabase.functions.invoke('girar-juego', { body: { negocio_id: negocioId, juego, preview: true } });
+    setResultado(error || data?.error ? `Error: ${data?.error ?? 'sin premios'}` : `🎉 Salió: ${data.premio}`);
     setGirando(false);
   }
 
@@ -105,7 +105,7 @@ export function JuegoSection({
         </span>
         {lista.length > 0 && (
           <button onClick={probar} disabled={girando} className="text-xs text-indigo-600 hover:underline">
-            {girando ? 'Girando…' : 'Probar giro'}
+            {girando ? 'Probando…' : juego === 'rasca' ? 'Probar rasca' : 'Probar giro'}
           </button>
         )}
       </div>
