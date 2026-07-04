@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { animate } from 'animejs';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 
@@ -60,20 +61,22 @@ export function SorteoEnVivo({
     reel[target] = nombreGanador;
     setItems(reel);
     setGanador(nombreGanador);
-
-    // Animación del reel (CSS transform).
-    requestAnimationFrame(() => {
-      const el = reelRef.current;
-      if (!el) return;
-      el.style.transition = 'none';
-      el.style.transform = 'translateY(0)';
-      void el.offsetHeight; // reflow
-      requestAnimationFrame(() => {
-        el.style.transition = 'transform 4.6s cubic-bezier(0.16, 1, 0.3, 1)';
-        el.style.transform = `translateY(-${target * ITEM_H}px)`;
-      });
-    });
+    // La animación (anime.js) la dispara el useEffect cuando el reel ya está en el DOM.
   }
+
+  // Anima el reel con anime.js: frena suavemente en el ganador (ease-out fuerte).
+  useEffect(() => {
+    if (fase !== 'girando' || items.length === 0 || !reelRef.current) return;
+    const target = items.length - 5;
+    const anim = animate(reelRef.current, {
+      translateY: [0, -(target * ITEM_H)],
+      duration: 4600,
+      ease: 'outExpo',
+      onComplete: () => { void alTerminar(); },
+    });
+    return () => { anim.pause(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, fase]);
 
   async function alTerminar() {
     if (fase !== 'girando') return;
@@ -112,7 +115,7 @@ export function SorteoEnVivo({
             </span>
           </div>
         ) : (
-          <div ref={reelRef} onTransitionEnd={alTerminar}>
+          <div ref={reelRef}>
             {items.map((n, i) => (
               <div key={i} className="flex items-center justify-center font-semibold" style={{ height: ITEM_H, fontSize: 26 }}>
                 {n}
