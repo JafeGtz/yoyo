@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
-import { Field, Input } from '@/components/ui/Input';
+import { Field, Input, Select } from '@/components/ui/Input';
 import { Card, PageHeader } from '@/components/ui/Card';
 
 interface Beneficio { id: string; estado: string; vence_en: string | null; beneficio: { nombre: string } | null }
@@ -13,6 +13,8 @@ interface Ajuste { id: string; delta: number; motivo: string | null; creado_en: 
 
 export function FichaClient(props: {
   clienteNegocioId: string;
+  clienteId: string;
+  logros: { id: string; nombre: string }[];
   nombre: string;
   celular: string | null;
   nivel: string | null;
@@ -32,7 +34,15 @@ export function FichaClient(props: {
   const [delta, setDelta] = useState('');
   const [motivo, setMotivo] = useState('');
   const [ajustes, setAjustes] = useState(props.ajustes);
+  const [insigniaId, setInsigniaId] = useState('');
   const [msg, setMsg] = useState<string | null>(null);
+
+  async function darInsignia() {
+    if (!insigniaId) return;
+    const { error } = await supabase.rpc('dar_insignia', { p_cliente_id: props.clienteId, p_logro_id: insigniaId });
+    setMsg(error ? 'Error: ' + error.message : 'Insignia otorgada ✓');
+    if (!error) setInsigniaId('');
+  }
 
   async function guardarNotas() {
     await supabase.from('cliente_negocio').update({ notas }).eq('id', props.clienteNegocioId);
@@ -136,6 +146,24 @@ export function FichaClient(props: {
           <Button variant="secondary" onClick={guardarNotas} className="mt-2">Guardar notas</Button>
         </Card>
       </div>
+
+      {/* Dar insignia manual */}
+      {props.logros.length > 0 && (
+        <Card className="mt-4">
+          <h3 className="mb-3 font-medium text-gray-900">Dar insignia</h3>
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <Field label="Insignia del negocio">
+                <Select value={insigniaId} onChange={e => setInsigniaId(e.target.value)}>
+                  <option value="">Elegir…</option>
+                  {props.logros.map(l => <option key={l.id} value={l.id}>{l.nombre}</option>)}
+                </Select>
+              </Field>
+            </div>
+            <Button variant="secondary" onClick={darInsignia}>Otorgar</Button>
+          </div>
+        </Card>
+      )}
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Beneficios */}

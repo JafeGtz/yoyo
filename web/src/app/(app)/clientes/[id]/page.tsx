@@ -20,7 +20,7 @@ export default async function FichaPage({ params }: { params: Promise<{ id: stri
 
   if (!cn) notFound();
 
-  const [{ data: beneficios }, { data: visitas }, { data: resenas }, { data: ajustes }] =
+  const [{ data: beneficios }, { data: visitas }, { data: resenas }, { data: ajustes }, { data: logros }] =
     await Promise.all([
       supabase
         .from('beneficio_desbloqueado')
@@ -46,6 +46,11 @@ export default async function FichaPage({ params }: { params: Promise<{ id: stri
         .select('id, delta, motivo, creado_en')
         .eq('cliente_negocio_id', cn.id)
         .order('creado_en', { ascending: false }),
+      supabase
+        .from('logro')
+        .select('id, nombre')
+        .eq('negocio_id', negocio!.id)
+        .order('creado_en', { ascending: false }),
     ]);
 
   const cliente = cn.cliente as unknown as { nombre: string; celular: string | null; cumpleanos: string | null };
@@ -56,6 +61,8 @@ export default async function FichaPage({ params }: { params: Promise<{ id: stri
       <Link href="/clientes" className="text-sm text-indigo-600 hover:underline">← Clientes</Link>
       <FichaClient
         clienteNegocioId={cn.id}
+        clienteId={cn.cliente_id}
+        logros={(logros as { id: string; nombre: string }[]) ?? []}
         nombre={cliente?.nombre ?? '—'}
         celular={cliente?.celular ?? null}
         nivel={nivel?.nombre ?? null}
