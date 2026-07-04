@@ -28,7 +28,7 @@ export default async function GamificacionPage() {
   ] = await Promise.all([
     supabase.from('negocio').select('config').eq('id', id).single(),
     supabase.from('reto').select('id, nombre, descripcion, activo, vence_en, beneficio_id').eq('negocio_id', id).order('creado_en', { ascending: false }),
-    supabase.from('rifa').select('id, nombre, premio, cierra_en, estado, beneficio_id').eq('negocio_id', id).order('creado_en', { ascending: false }),
+    supabase.from('rifa').select('id, nombre, premio, cierra_en, estado, beneficio_id, criterio').eq('negocio_id', id).order('creado_en', { ascending: false }),
     supabase.from('premio_juego').select('id, juego, nombre, probabilidad, activo, beneficio_id').eq('negocio_id', id),
     supabase.from('logro').select('id, nombre, descripcion').eq('ambito', 'global').order('creado_en'),
     supabase.from('logro').select('id, nombre, descripcion').eq('negocio_id', id).order('creado_en', { ascending: false }),

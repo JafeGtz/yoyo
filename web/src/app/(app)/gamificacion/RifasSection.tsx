@@ -5,8 +5,9 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { SorteoEnVivo } from './SorteoEnVivo';
 
-interface Rifa { id: string; nombre: string; premio: string | null; cierra_en: string | null; estado: string; ganador?: string }
+interface Rifa { id: string; nombre: string; premio: string | null; cierra_en: string | null; estado: string; ganador?: string; criterio?: { min_visitas?: number } | null }
 interface BeneficioOpcion { id: string; nombre: string }
 
 export function RifasSection({ negocioId, inicial, beneficios }: { negocioId: string; inicial: Rifa[]; beneficios: BeneficioOpcion[] }) {
@@ -18,6 +19,7 @@ export function RifasSection({ negocioId, inicial, beneficios }: { negocioId: st
   const [minVisitas, setMinVisitas] = useState('0');
   const [cierra, setCierra] = useState('');
   const [sorteandoId, setSorteandoId] = useState<string | null>(null);
+  const [envivo, setEnvivo] = useState<Rifa | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function crear(e: React.FormEvent) {
@@ -80,15 +82,27 @@ export function RifasSection({ negocioId, inicial, beneficios }: { negocioId: st
               </span>
               <span className="flex items-center gap-3">
                 {r.estado !== 'sorteada' && (
-                  <button onClick={() => sortear(r)} disabled={sorteandoId === r.id} className="text-indigo-600 hover:underline">
-                    {sorteandoId === r.id ? 'Sorteando…' : 'Sortear'}
-                  </button>
+                  <>
+                    <button onClick={() => setEnvivo(r)} className="font-medium text-indigo-600 hover:underline">🎬 Sortear en vivo</button>
+                    <button onClick={() => sortear(r)} disabled={sorteandoId === r.id} className="text-gray-500 hover:underline">
+                      {sorteandoId === r.id ? 'Sorteando…' : 'Rápido'}
+                    </button>
+                  </>
                 )}
                 <button onClick={() => eliminar(r.id)} className="text-red-600 hover:underline">Eliminar</button>
               </span>
             </li>
           ))}
         </ul>
+      )}
+
+      {envivo && (
+        <SorteoEnVivo
+          negocioId={negocioId}
+          rifa={{ id: envivo.id, nombre: envivo.nombre, premio: envivo.premio, minVisitas: envivo.criterio?.min_visitas ?? 0 }}
+          onClose={() => setEnvivo(null)}
+          onSorteada={(ganador) => setLista(lista.map(x => (x.id === envivo.id ? { ...x, estado: 'sorteada', ganador } : x)))}
+        />
       )}
     </Card>
   );
