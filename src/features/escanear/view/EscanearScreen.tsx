@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { QrScanner } from '../../../shared/ui/QrScanner';
 import { colors, radii, spacing } from '../../../shared/theme';
-import { registrarVisita, ApiError, type ResultadoVisita } from '../../../data/services/canjeService';
+import {
+  registrarVisita, ApiError, catalogoDelNegocio, marcarProductoVisita,
+  type ResultadoVisita, type ProductoOpcion,
+} from '../../../data/services/canjeService';
 
 const FONDO = '#15131F';
 type Estado = 'escaneando' | 'procesando' | 'pide_codigo' | 'exito' | 'error';
@@ -18,6 +21,22 @@ export function EscanearScreen() {
   const [codigo, setCodigo] = useState('');
   const [resultado, setResultado] = useState<ResultadoVisita | null>(null);
   const [error, setError] = useState('');
+  const [productos, setProductos] = useState<ProductoOpcion[]>([]);
+  const [productoElegido, setProductoElegido] = useState<string | null>(null);
+
+  // Al registrar la visita, carga el catálogo para poder etiquetar el producto.
+  useEffect(() => {
+    if (estado !== 'exito' || !resultado?.negocio_id) return;
+    let vivo = true;
+    catalogoDelNegocio(resultado.negocio_id).then(p => { if (vivo) setProductos(p); });
+    return () => { vivo = false; };
+  }, [estado, resultado?.negocio_id]);
+
+  async function etiquetar(item: ProductoOpcion) {
+    if (!resultado?.visita_id) return;
+    setProductoElegido(item.nombre);
+    try { await marcarProductoVisita(resultado.visita_id, item.id); } catch { /* opcional, no bloquea */ }
+  }
 
   async function intentar(qrToken: string, cod?: string) {
     setEstado('procesando');
@@ -50,6 +69,8 @@ export function EscanearScreen() {
     setError('');
     setCodigo('');
     setToken('');
+    setProductos([]);
+    setProductoElegido(null);
     setEstado('escaneando');
   }
 
@@ -68,6 +89,25 @@ export function EscanearScreen() {
               ))}
             </View>
           )}
+
+          {/* Etiquetar producto (opcional) — avanza retos de producto */}
+          {productos.length > 0 && (
+            productoElegido ? (
+              <AppText variant="caption" color={colors.mint} style={styles.overlayTexto}>✓ Anotamos: {productoElegido}</AppText>
+            ) : (
+              <View style={styles.etiquetar}>
+                <AppText variant="caption" color={colors.textSecondary}>¿Qué te llevaste? (opcional)</AppText>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+                  {productos.map(p => (
+                    <Pressable key={p.id} onPress={() => etiquetar(p)} style={styles.chip}>
+                      <AppText variant="caption" color={colors.textPrimary}>{p.nombre}</AppText>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
+            )
+          )}
+
           <AppButton titulo="Listo" onPress={reiniciar} style={styles.botonClaro} />
         </View>
       </Screen>
@@ -139,4 +179,7 @@ const styles = StyleSheet.create({
   exitoTitulo: { marginTop: spacing.md },
   beneficios: { alignItems: 'center', marginTop: spacing.lg, backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.lg, alignSelf: 'stretch' },
   beneficio: { marginTop: spacing.xs },
+  etiquetar: { alignSelf: 'stretch', marginTop: spacing.lg },
+  chips: { gap: spacing.sm, paddingVertical: spacing.sm },
+  chip: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radii.md, backgroundColor: colors.surface },
 });

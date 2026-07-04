@@ -108,10 +108,10 @@ Deno.serve(async (req: Request) => {
     // 5) Registrar la visita. (No tragar el error: dispara triggers de
     //    gamificación; si falla, hay que reportarlo, no fingir éxito.)
     const montoVisita = negocio.modelo_acumulacion === 'plus' ? (monto ?? null) : null;
-    const { error: visitaErr } = await admin.from('visita').insert({
+    const { data: visitaRow, error: visitaErr } = await admin.from('visita').insert({
       cliente_id: cliente.id, negocio_id: negocioId, via: 'qr',
       lat: lat ?? null, lng: lng ?? null, monto: montoVisita,
-    });
+    }).select('id').single();
     if (visitaErr) return json({ error: 'error_registrar_visita', detalle: visitaErr.message }, 500);
 
     // 6) Actualizar acumulado (cliente_negocio).
@@ -190,6 +190,8 @@ Deno.serve(async (req: Request) => {
     }
 
     return json({
+      visita_id: visitaRow?.id,
+      negocio_id: negocioId,
       visita_numero: visitasTotales,
       monto_acumulado: montoAcum,
       beneficios_desbloqueados: desbloqueados,

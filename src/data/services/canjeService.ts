@@ -1,10 +1,14 @@
 import { supabase } from '../supabase/supabaseClient';
 
 export interface ResultadoVisita {
+  visita_id: string;
+  negocio_id: string;
   visita_numero: number;
   monto_acumulado: number;
   beneficios_desbloqueados: { id: string; nombre: string }[];
 }
+
+export interface ProductoOpcion { id: string; nombre: string }
 
 export interface ResultadoCanje {
   ok: boolean;
@@ -71,6 +75,25 @@ export function registrarVisita(
     lng: ubicacion?.lng,
     codigo,
   });
+}
+
+/** Catálogo del negocio (para etiquetar el producto de una visita). */
+export async function catalogoDelNegocio(negocioId: string): Promise<ProductoOpcion[]> {
+  const { data } = await supabase
+    .from('catalogo_item')
+    .select('id, nombre')
+    .eq('negocio_id', negocioId)
+    .order('orden');
+  return (data as ProductoOpcion[]) ?? [];
+}
+
+/** El cliente etiqueta qué producto se llevó en su visita (avanza retos de producto). */
+export async function marcarProductoVisita(visitaId: string, itemId: string): Promise<void> {
+  const { error } = await supabase.rpc('marcar_producto_visita', {
+    p_visita_id: visitaId,
+    p_item_id: itemId,
+  });
+  if (error) throw new Error(error.message);
 }
 
 export function generarCodigoVisita(negocioId: string, usosMax?: number) {

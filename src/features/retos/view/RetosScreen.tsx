@@ -26,6 +26,8 @@ function progresoTexto(tipo: string, progreso: number, meta: number) {
   if (tipo === 'monto') return `$${p} / $${meta}`;
   if (tipo === 'racha') return `${p} / ${meta} días seguidos`;
   if (tipo === 'referidos') return `${p} / ${meta} amigos`;
+  if (tipo === 'resena') return `${p} / ${meta} reseña${meta === 1 ? '' : 's'}`;
+  if (tipo === 'producto') return `${p} / ${meta} veces`;
   return `${p} / ${meta} visitas`;
 }
 
