@@ -104,6 +104,26 @@ export function DetalleNegocioScreen() {
         />
       )}
 
+      {/* Retos */}
+      {d.tieneRetos && (
+        <AppButton
+          titulo="🎯 Retos"
+          variante="secundario"
+          style={styles.ruletaBtn}
+          onPress={() => navigation.navigate('Retos', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
+        />
+      )}
+
+      {/* Rifas */}
+      {d.tieneRifas && (
+        <AppButton
+          titulo="🎁 Rifas"
+          variante="secundario"
+          style={styles.ruletaBtn}
+          onPress={() => navigation.navigate('Rifas', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
+        />
+      )}
+
       {/* Agendar cita */}
       {d.negocio.citas_modo !== 'desactivado' && (
         <AppButton
