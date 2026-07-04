@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
 import { Card, PageHeader } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 export interface Beneficio {
   id: string;
@@ -167,7 +168,7 @@ export function BeneficiosClient({
 
   return (
     <div>
-      <PageHeader title="Beneficios" description="Configura los premios que tus clientes desbloquean." />
+      <PageHeader icon="🎁" title="Beneficios" description="Configura los premios que tus clientes desbloquean." />
 
       <Card className="mb-6">
         <h3 className="mb-3 font-medium text-gray-900">{editandoId ? 'Editar beneficio' : 'Nuevo beneficio'}</h3>
@@ -275,9 +276,7 @@ export function BeneficiosClient({
                   <td className="px-4 py-3 text-gray-600">{b.stock_total ?? '∞'}</td>
                   <td className="px-4 py-3 text-gray-600">{b.cupo_dia ?? '∞'}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${b.estado === 'activo' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                      {b.estado}
-                    </span>
+                    <Badge tono={b.estado === 'activo' ? 'green' : 'amber'}>{b.estado}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <button onClick={() => editar(b)} className="mr-3 text-gray-700 hover:underline">Editar</button>

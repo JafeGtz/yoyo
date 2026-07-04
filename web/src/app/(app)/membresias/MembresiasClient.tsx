@@ -130,7 +130,7 @@ export function MembresiasClient({
 
   return (
     <div>
-      <PageHeader title="Membresías" description="Niveles que tus clientes alcanzan automáticamente, con beneficios exclusivos." />
+      <PageHeader icon="🏅" title="Membresías" description="Niveles que tus clientes alcanzan automáticamente, con beneficios exclusivos." />
 
       {/* Criterio del negocio */}
       <Card className="mb-6">

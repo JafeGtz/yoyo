@@ -57,7 +57,7 @@ export function PersonalClient({
 
   return (
     <div>
-      <PageHeader title="Personal" description="Empleados que confirman canjes desde la app." />
+      <PageHeader icon="🧑‍💼" title="Personal" description="Empleados que confirman canjes desde la app." />
 
       {esDueno && (
         <Card className="mb-6">

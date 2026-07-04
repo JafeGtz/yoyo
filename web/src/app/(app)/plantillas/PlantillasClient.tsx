@@ -48,7 +48,7 @@ export function PlantillasClient({ negocioId }: { negocioId: string }) {
 
   return (
     <div>
-      <PageHeader title="Plantillas por industria" description="Empieza rápido con un set pre-armado y luego ajústalo." />
+      <PageHeader icon="🧩" title="Plantillas por industria" description="Empieza rápido con un set pre-armado y luego ajústalo." />
 
       {msg && (
         <div className={`mb-4 rounded-lg px-4 py-3 text-sm ${msg.ok ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>

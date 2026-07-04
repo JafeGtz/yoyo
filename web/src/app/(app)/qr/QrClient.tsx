@@ -42,6 +42,7 @@ export function QrClient({
   return (
     <div>
       <PageHeader
+        icon="🔳"
         title="QR del negocio"
         description="Imprime este código y pégalo en tu local. Tus clientes lo escanean para registrar su visita."
       />

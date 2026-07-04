@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
 import { Card, PageHeader } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { ConfigCitas } from './ConfigCitas';
 import { CalendarioSemana } from './CalendarioSemana';
 import { fechaHoraEnZona, instanteDesdeWallClock } from '@/lib/zona';
@@ -29,12 +30,12 @@ export interface AgendaConfig {
   timezone?: string;
 }
 
-const COLOR: Record<string, string> = {
-  pendiente: 'bg-yellow-100 text-yellow-700',
-  confirmada: 'bg-green-100 text-green-700',
-  cancelada: 'bg-red-100 text-red-700',
-  completada: 'bg-gray-100 text-gray-600',
-};
+const TONO = {
+  pendiente: 'amber',
+  confirmada: 'green',
+  cancelada: 'red',
+  completada: 'gray',
+} as const;
 
 export function CitasClient({
   negocioId,
@@ -88,7 +89,7 @@ export function CitasClient({
 
   return (
     <div>
-      <PageHeader title="Agenda de citas" description="Reservas de tus clientes. Confirma, cancela o márcalas como completadas." />
+      <PageHeader icon="📅" title="Agenda de citas" description="Reservas de tus clientes. Confirma, cancela o márcalas como completadas." />
 
       <ConfigCitas negocioId={negocioId} modoInicial={modoInicial} configInicial={configInicial} />
 
@@ -141,7 +142,7 @@ export function CitasClient({
                   <td className="px-4 py-3 text-gray-900">{c.cliente?.nombre ?? '—'}</td>
                   <td className="px-4 py-3 text-gray-600">{c.servicio ?? '—'}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${COLOR[c.estado]}`}>{c.estado}</span>
+                    <Badge tono={TONO[c.estado]}>{c.estado}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     {c.estado !== 'completada' && c.estado !== 'cancelada' && (

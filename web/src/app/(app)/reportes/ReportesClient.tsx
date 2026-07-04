@@ -58,7 +58,7 @@ export function ReportesClient({ negocioId }: { negocioId: string; esPlus: boole
 
   return (
     <div>
-      <PageHeader title="Reportes y exportación" description="Descarga tus datos para análisis o contabilidad." />
+      <PageHeader icon="📈" title="Reportes y exportación" description="Descarga tus datos para análisis o contabilidad." />
 
       {msg && <p className="mb-4 text-sm text-green-600">{msg}</p>}
 

@@ -26,7 +26,7 @@ const FAQS = [
 export default function AyudaPage() {
   return (
     <div>
-      <PageHeader title="Centro de ayuda" description="Preguntas frecuentes y soporte." />
+      <PageHeader icon="💬" title="Centro de ayuda" description="Preguntas frecuentes y soporte." />
 
       <div className="space-y-3">
         {FAQS.map((f, i) => (

@@ -65,6 +65,7 @@ export function CapacidadClient({ inicial }: { inicial: BeneficioCap[] }) {
   return (
     <div>
       <PageHeader
+        icon="📦"
         title="Control de capacidad"
         description="Cuánto puedes regalar sin pasarte. El límite se aplica al GANAR: si se acaba el stock, deja de repartirse (a quien ya ganó, se le respeta)."
         action={

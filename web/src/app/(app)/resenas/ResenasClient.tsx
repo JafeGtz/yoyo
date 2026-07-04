@@ -42,6 +42,7 @@ export function ResenasClient({ inicial }: { inicial: Resena[] }) {
   return (
     <div>
       <PageHeader
+        icon="⭐"
         title="Reseñas"
         description="Privadas para ti. Aprueba solo las que quieras mostrar públicamente."
       />

@@ -24,7 +24,7 @@ export function ClientesClient({ filas, esPlus }: { filas: FilaCliente[]; esPlus
 
   return (
     <div>
-      <PageHeader title="Clientes" description="Busca, revisa y administra a tus clientes." />
+      <PageHeader icon="👥" title="Clientes" description="Busca, revisa y administra a tus clientes." />
 
       <div className="mb-4 max-w-sm">
         <Input placeholder="Buscar por nombre o celular…" value={q} onChange={e => setQ(e.target.value)} />

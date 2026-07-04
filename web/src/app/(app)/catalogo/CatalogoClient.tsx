@@ -106,7 +106,7 @@ export function CatalogoClient({
 
   return (
     <div>
-      <PageHeader title="Catálogo / menú" description="Productos y servicios que verán tus clientes en la app." />
+      <PageHeader icon="📖" title="Catálogo / menú" description="Productos y servicios que verán tus clientes en la app." />
 
       {/* Categorías */}
       <Card className="mb-6">
