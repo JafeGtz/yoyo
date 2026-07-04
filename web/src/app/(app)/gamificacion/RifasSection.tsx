@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
+import { Card, SectionTitle } from '@/components/ui/Card';
 import { SorteoEnVivo } from './SorteoEnVivo';
 
 interface Rifa { id: string; nombre: string; premio: string | null; cierra_en: string | null; estado: string; ganador?: string; criterio?: { min_visitas?: number } | null }
@@ -53,8 +53,7 @@ export function RifasSection({ negocioId, inicial, beneficios }: { negocioId: st
 
   return (
     <Card>
-      <h3 className="mb-1 font-medium text-gray-900">Rifas</h3>
-      <p className="mb-3 text-sm text-gray-500">Al sortear, el ganador recibe el beneficio en su app (si eliges uno) y lo verás aquí.</p>
+      <SectionTitle icon="🎁" title="Rifas" subtitle="Al sortear, el ganador recibe el beneficio en su app y lo ves aquí" accent="rose" />
       <form onSubmit={crear} className="grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end">
         <Field label="Nombre"><Input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Rifa de septiembre" required /></Field>
         <Field label="Premio (texto)"><Input value={premio} onChange={e => setPremio(e.target.value)} placeholder="Pantalla, cena…" /></Field>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
+import { Card, SectionTitle } from '@/components/ui/Card';
 
 interface Reto { id: string; nombre: string; descripcion: string | null; activo: boolean; vence_en: string | null; beneficio_id?: string | null; tipo?: string; meta?: number; catalogo_item_id?: string | null }
 interface BeneficioOpcion { id: string; nombre: string }
@@ -61,8 +61,7 @@ export function RetosSection({ negocioId, inicial, beneficios, productos }: { ne
 
   return (
     <Card>
-      <h3 className="mb-1 font-medium text-gray-900">Retos y misiones</h3>
-      <p className="mb-3 text-sm text-gray-500">El cliente cumple el reto con su actividad y, al lograrlo, recibe el beneficio en su app.</p>
+      <SectionTitle icon="🎯" title="Retos y misiones" subtitle="El cliente cumple el reto con su actividad y recibe el beneficio en su app" accent="emerald" />
       <form onSubmit={crear} className="grid grid-cols-1 gap-3 md:grid-cols-6 md:items-end">
         <div className="md:col-span-2"><Field label="Reto"><Input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Cliente frecuente del mes" required /></Field></div>
         <Field label="Tipo">

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
+import { Card, SectionTitle } from '@/components/ui/Card';
 
 interface Cond { tipo?: string; valor?: string }
 interface Logro { id: string; nombre: string; descripcion: string | null; condicion?: Cond }
@@ -78,7 +78,7 @@ export function LogrosSection({
 
   return (
     <Card>
-      <h3 className="mb-3 font-medium text-gray-900">Logros e insignias</h3>
+      <SectionTitle icon="🏅" title="Logros e insignias" subtitle="Se ganan solas por condición, o las das a mano desde el CRM" accent="amber" />
 
       <div className="mb-4">
         <div className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Insignias por defecto (activas)</div>

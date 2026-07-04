@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Select } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
+import { Card, SectionTitle } from '@/components/ui/Card';
 
 interface Premio { id: string; nombre: string; probabilidad: number; activo: boolean; beneficio_id: string | null }
 interface BeneficioOpcion { id: string; nombre: string }
@@ -69,7 +69,12 @@ export function JuegoSection({
 
   return (
     <Card>
-      <h3 className="mb-3 font-medium text-gray-900">{titulo}</h3>
+      <SectionTitle
+        icon={juego === 'rasca' ? '🪙' : '🎡'}
+        title={titulo}
+        subtitle="Premios con probabilidad; el que mapea a un beneficio se entrega solo"
+        accent={juego === 'rasca' ? 'sky' : 'violet'}
+      />
 
       {/* Config: quién puede jugar y cuántas veces */}
       <div className="mb-4 grid grid-cols-1 gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-3 sm:items-end">

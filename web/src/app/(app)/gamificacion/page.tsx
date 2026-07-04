@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { getSesion } from '@/lib/session';
-import { Card, PageHeader } from '@/components/ui/Card';
+import { Card, PageHeader, SectionTitle } from '@/components/ui/Card';
 import { TogglesSection } from './TogglesSection';
 import { RetosSection } from './RetosSection';
 import { RifasSection } from './RifasSection';
@@ -53,22 +53,28 @@ export default async function GamificacionPage() {
 
   return (
     <div>
-      <PageHeader title="Gamificación" description="Retos, rifas, juegos e insignias para enganchar a tus clientes." />
-      <div className="space-y-6">
+      <PageHeader icon="🎮" title="Gamificación" description="Retos, rifas, juegos e insignias para enganchar a tus clientes." />
+      <div className="space-y-8">
         <TogglesSection negocioId={id} config={(neg?.config as Record<string, boolean>) ?? {}} />
 
         <Card>
-          <h3 className="mb-3 font-medium text-gray-900">Top clientes del mes</h3>
+          <SectionTitle icon="🏆" title="Top clientes del mes" subtitle="Los que más te visitan" accent="amber" />
           {top.length === 0 ? (
             <p className="text-sm text-gray-400">Sin visitas este mes todavía.</p>
           ) : (
-            <ol className="space-y-1">
-              {top.map((t, i) => (
-                <li key={i} className="flex justify-between text-sm">
-                  <span className="text-gray-800">{i + 1}. {t.nombre}</span>
-                  <span className="text-gray-500">{t.visitas} visitas</span>
-                </li>
-              ))}
+            <ol className="space-y-1.5">
+              {top.map((t, i) => {
+                const medalla = ['🥇', '🥈', '🥉'][i];
+                return (
+                  <li key={i} className="flex items-center justify-between rounded-xl px-3 py-2 text-sm odd:bg-gray-50/70">
+                    <span className="flex items-center gap-2 text-gray-800">
+                      <span className={`w-6 text-center ${medalla ? 'text-base' : 'text-xs font-semibold text-gray-400'}`}>{medalla ?? i + 1}</span>
+                      {t.nombre}
+                    </span>
+                    <span className="font-semibold text-gray-500">{t.visitas} visitas</span>
+                  </li>
+                );
+              })}
             </ol>
           )}
         </Card>
