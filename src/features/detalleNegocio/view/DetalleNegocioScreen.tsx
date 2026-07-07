@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -74,14 +74,16 @@ export function DetalleNegocioScreen() {
             <AppText variant="caption" color="rgba(255,255,255,0.8)">visitas · Nivel {d.nivel}</AppText>
           </View>
         </View>
-        {d.beneficios.length > 0 && (
-          <View style={styles.heroProg}>
-            <ProgressBar valor={0.6} />
-            <AppText variant="caption" color="rgba(255,255,255,0.8)" style={styles.heroSub}>
-              Tienes {d.beneficios.length} beneficio{d.beneficios.length === 1 ? '' : 's'} listo{d.beneficios.length === 1 ? '' : 's'}
-            </AppText>
-          </View>
-        )}
+        <View style={styles.heroProg}>
+          <ProgressBar valor={d.progresoBeneficio} />
+          <AppText variant="caption" color="rgba(255,255,255,0.8)" style={styles.heroSub}>
+            {d.faltanProximo != null
+              ? `Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
+              : d.beneficios.length > 0
+                ? `Tienes ${d.beneficios.length} beneficio${d.beneficios.length === 1 ? '' : 's'} listo${d.beneficios.length === 1 ? '' : 's'} 🎁`
+                : '¡Sigue visitando para ganar beneficios!'}
+          </AppText>
+        </View>
       </HeroCard>
 
       {/* Gira y Gana */}
@@ -190,19 +192,23 @@ export function DetalleNegocioScreen() {
         </>
       )}
 
-      {/* Catálogo */}
+      {/* Catálogo en cuadrícula con fotos */}
       {d.catalogo.length > 0 && (
         <>
           <SectionHeader titulo="Catálogo" />
-          {d.catalogo.map(it => (
-            <SoftCard key={it.id} style={styles.item}>
-              <View style={styles.flex}>
-                <AppText variant="subtitle">{it.nombre}</AppText>
-                {it.descripcion && <AppText variant="caption" color={colors.textSecondary}>{it.descripcion}</AppText>}
+          <View style={styles.grid}>
+            {d.catalogo.map(it => (
+              <View key={it.id} style={styles.gridItem}>
+                <View style={styles.gridFoto}>
+                  {it.foto_url
+                    ? <Image source={{ uri: it.foto_url }} style={styles.fotoImg} resizeMode="cover" />
+                    : <AppText variant="hero">🛍️</AppText>}
+                </View>
+                <AppText variant="caption" numberOfLines={1} style={styles.gridNombre}>{it.nombre}</AppText>
+                {it.precio != null && <AppText variant="subtitle" color={colors.primary}>${it.precio}</AppText>}
               </View>
-              {it.precio != null && <AppText variant="subtitle" color={colors.primary}>${it.precio}</AppText>}
-            </SoftCard>
-          ))}
+            ))}
+          </View>
         </>
       )}
 
@@ -253,6 +259,17 @@ const styles = StyleSheet.create({
   heroProg: { marginTop: spacing.md },
   heroSub: { marginTop: spacing.sm },
   item: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  gridItem: {
+    width: '47%', backgroundColor: colors.surface, borderRadius: radii.lg,
+    padding: spacing.sm, alignItems: 'center',
+  },
+  gridFoto: {
+    width: '100%', height: 100, borderRadius: radii.md, backgroundColor: colors.lavender,
+    alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: spacing.sm,
+  },
+  fotoImg: { width: '100%', height: '100%' },
+  gridNombre: { textAlign: 'center', marginBottom: 2 },
   usar: { backgroundColor: colors.primary, borderRadius: radii.pill, paddingHorizontal: 16, paddingVertical: 8 },
   bold: { fontWeight: '700' },
   info: { marginTop: spacing.lg },

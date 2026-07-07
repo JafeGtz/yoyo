@@ -25,8 +25,9 @@ export class NegocioRepositorySupabase implements NegocioRepository {
     const filas = (data as unknown as FilaCN[]).filter(f => f.negocio);
     const negocioIds = filas.map(f => f.negocio!.id);
 
-    // Próximo beneficio por negocio (siguiente umbral de visitas no alcanzado).
+    // Próximo beneficio por negocio (siguiente umbral no alcanzado) + umbral previo.
     const proximos = new Map<string, { nombre: string; faltan: number }>();
+    const desdePorNegocio = new Map<string, number>();
     if (negocioIds.length > 0) {
       const { data: benes } = await supabase
         .from('beneficio')
@@ -36,8 +37,9 @@ export class NegocioRepositorySupabase implements NegocioRepository {
         .not('condicion_visitas', 'is', null);
 
       for (const f of filas) {
-        const candidatos = (benes ?? [])
-          .filter(b => b.negocio_id === f.negocio!.id && b.condicion_visitas! > f.visitas_totales)
+        const delNegocio = (benes ?? []).filter(b => b.negocio_id === f.negocio!.id);
+        const candidatos = delNegocio
+          .filter(b => b.condicion_visitas! > f.visitas_totales)
           .sort((a, b) => a.condicion_visitas! - b.condicion_visitas!);
         if (candidatos[0]) {
           proximos.set(f.negocio!.id, {
@@ -45,6 +47,11 @@ export class NegocioRepositorySupabase implements NegocioRepository {
             faltan: candidatos[0].condicion_visitas! - f.visitas_totales,
           });
         }
+        // Umbral previo = mayor condición ya alcanzada (o 0).
+        const alcanzados = delNegocio
+          .filter(b => b.condicion_visitas! <= f.visitas_totales)
+          .map(b => b.condicion_visitas!);
+        desdePorNegocio.set(f.negocio!.id, alcanzados.length ? Math.max(...alcanzados) : 0);
       }
     }
 
@@ -61,6 +68,7 @@ export class NegocioRepositorySupabase implements NegocioRepository {
         nivelActual: f.nivel?.nombre ?? 'Sin nivel',
         proximoBeneficio: prox?.nombre,
         visitasParaProximoBeneficio: prox?.faltan,
+        desdeVisitas: desdePorNegocio.get(f.negocio!.id) ?? 0,
       };
     });
 

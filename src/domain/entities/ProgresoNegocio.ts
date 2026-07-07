@@ -11,4 +11,6 @@ export interface ProgresoNegocio {
   /** Visitas que faltan para el próximo beneficio, si hay uno próximo. */
   visitasParaProximoBeneficio?: number;
   proximoBeneficio?: string;
+  /** Umbral del beneficio anterior ya alcanzado (para medir la barra de hito a hito). */
+  desdeVisitas?: number;
 }

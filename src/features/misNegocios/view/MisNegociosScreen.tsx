@@ -36,8 +36,9 @@ export function MisNegociosScreen() {
         <>
           <SectionHeader titulo="Mis negocios" />
           {state.negocios.map(n => {
-            const umbral = n.visitasTotales + (n.visitasParaProximoBeneficio ?? 0);
-            const prog = umbral > 0 ? n.visitasTotales / umbral : 1;
+            const desde = n.desdeVisitas ?? 0;
+            const meta = n.visitasTotales + (n.visitasParaProximoBeneficio ?? 0);
+            const prog = meta > desde ? (n.visitasTotales - desde) / (meta - desde) : 1;
             return (
               <Pressable key={n.negocio.id} onPress={() => verDetalle(n.negocio.id, n.negocio.nombre)}>
                 <Card style={styles.negocio}>
@@ -55,11 +56,18 @@ export function MisNegociosScreen() {
                   </View>
                   <View style={styles.barra}>
                     <ProgressBar valor={prog} color={colors.primary} trackColor={colors.surface} />
+                    {/* Escala tipo regla: hito previo → meta */}
+                    <View style={styles.regla}>
+                      <AppText variant="caption" color={colors.textSecondary}>{desde}</AppText>
+                      <AppText variant="caption" color={colors.textSecondary}>
+                        {n.proximoBeneficio ? `${meta} visitas` : 'máx'}
+                      </AppText>
+                    </View>
                   </View>
                   <AppText variant="caption" color={n.proximoBeneficio ? colors.primary : colors.textSecondary}>
                     {n.proximoBeneficio
                       ? `Faltan ${n.visitasParaProximoBeneficio} para ${n.proximoBeneficio}`
-                      : 'Sin beneficios próximos'}
+                      : '¡Todo desbloqueado aquí! 🎉'}
                   </AppText>
                 </Card>
               </Pressable>
@@ -109,6 +117,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   visitasPill: { alignItems: 'center' },
   barra: { marginVertical: spacing.sm },
+  regla: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.xs },
   intro: { marginTop: spacing.md },
   carrusel: { gap: spacing.md, paddingVertical: spacing.sm, paddingRight: spacing.lg },
   tarjeta: { width: 240, borderRadius: radii.xl, backgroundColor: colors.white, overflow: 'hidden', borderWidth: 1, borderColor: colors.border },
