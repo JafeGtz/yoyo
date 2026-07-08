@@ -46,6 +46,7 @@ export function RuletaScreen() {
   const [premios, setPremios] = useState<string[]>([]);
   const [premio, setPremio] = useState<string | null>(null);
   const [detalle, setDetalle] = useState('');
+  const [gano, setGano] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -90,14 +91,15 @@ export function RuletaScreen() {
     Animated.timing(anim, { toValue: final, duration: 4200, easing: Easing.out(Easing.cubic), useNativeDriver: true })
       .start(() => {
         setPremio(data.premio);
-        setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'Se agotó, ¡sigue participando!' : '');
+        setGano(!!data.canjeable);
+        setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'Se agotó esta vez 😅' : '');
         setEstado('resultado');
       });
   }
 
   return (
     <Screen scroll>
-      {estado === 'resultado' && <Confetti />}
+      {estado === 'resultado' && gano && <Confetti />}
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
         <AppText variant="title" color={colors.primary}>‹</AppText>
       </Pressable>
@@ -142,8 +144,8 @@ export function RuletaScreen() {
 
           {estado === 'resultado' && premio && (
             <View style={styles.resultado}>
-              <AppText variant="hero">🎉</AppText>
-              <AppText variant="title" color={colors.primary}>¡Ganaste!</AppText>
+              <AppText variant="hero">{gano ? '🎉' : '🍀'}</AppText>
+              <AppText variant="title" color={gano ? colors.primary : colors.textSecondary}>{gano ? '¡Ganaste!' : '¡Casi!'}</AppText>
               <AppText variant="subtitle">{premio}</AppText>
               {detalle ? <AppText variant="caption" color={colors.textSecondary} style={styles.sub}>{detalle}</AppText> : null}
             </View>

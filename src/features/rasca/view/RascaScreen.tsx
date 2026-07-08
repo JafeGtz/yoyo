@@ -13,8 +13,8 @@ import type { ConsumidorStackParams } from '../../../app/navigation/types';
 const { width } = Dimensions.get('window');
 const W = Math.min(width - 48, 340);
 const H = 190;
-const RAD = 28;   // radio del rascado
-const META = 16;  // rasguños para revelar
+const RAD = 22;   // radio del rascado
+const META = 34;  // rasguños para revelar (hay que rascar buena parte)
 
 const ERRORES: Record<string, string> = {
   sin_premios: 'Este negocio aún no configuró el rasca y gana.',
@@ -31,6 +31,7 @@ export function RascaScreen() {
   const [cargando, setCargando] = useState(true);
   const [premio, setPremio] = useState<string | null>(null);
   const [detalle, setDetalle] = useState('');
+  const [gano, setGano] = useState(false);
   const [error, setError] = useState('');
   const [puntos, setPuntos] = useState<{ x: number; y: number }[]>([]);
   const [revelado, setRevelado] = useState(false);
@@ -64,15 +65,20 @@ export function RascaScreen() {
       return;
     }
     setPremio(data.premio);
-    setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'Se agotó, ¡sigue participando!' : '');
+    setGano(!!data.canjeable);
+    setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'Se agotó esta vez 😅' : '');
   }
 
   function revelar() {
     if (reveladoRef.current) return;
     reveladoRef.current = true;
     setRevelado(true);
-    setConfeti(true);
   }
+
+  // El confeti salta cuando ya se reveló Y sabemos que ganó (la API es async).
+  useEffect(() => {
+    if (revelado && gano) setConfeti(true);
+  }, [revelado, gano]);
 
   function agregar(x: number, y: number) {
     const u = ultimo.current;
@@ -123,10 +129,15 @@ export function RascaScreen() {
                 <AppText color={colors.danger} style={styles.center}>{error}</AppText>
               ) : (
                 <>
-                  <AppText variant="hero">{revelado ? '🎉' : '🎁'}</AppText>
+                  <AppText variant="hero">{revelado ? (gano ? '🎉' : '🍀') : '🎁'}</AppText>
                   {premio ? (
                     <>
-                      <AppText variant="title" color={colors.primary}>{premio}</AppText>
+                      {revelado && (
+                        <AppText variant="subtitle" color={gano ? colors.mint : colors.textSecondary}>
+                          {gano ? '¡Ganaste!' : '¡Casi!'}
+                        </AppText>
+                      )}
+                      <AppText variant="title" color={gano ? colors.primary : colors.textSecondary}>{premio}</AppText>
                       {detalle ? <AppText variant="caption" color={colors.textSecondary}>{detalle}</AppText> : null}
                     </>
                   ) : (

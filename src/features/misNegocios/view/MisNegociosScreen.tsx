@@ -10,13 +10,26 @@ import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisNegociosViewModel } from '../viewmodel/useMisNegociosViewModel';
 import { useDescubrirViewModel, type NegocioDir } from '../../descubrir/viewmodel/useDescubrirViewModel';
+import { useInsigniasViewModel } from '../../insignias/viewmodel/useInsigniasViewModel';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
+
+const ICONOS: Record<string, string> = {
+  sparkle: '✨', medal: '🥇', trophy: '🏆', sunrise: '🌅', moon: '🌙',
+  users: '👥', cake: '🎂', compass: '🧭', flame: '🔥', crown: '👑',
+};
+const emoji = (icono: string | null) => (icono && ICONOS[icono]) || '🏅';
 
 export function MisNegociosScreen() {
   const { perfil } = useSession();
   const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
   const { state } = useMisNegociosViewModel(perfil?.cliente_id ?? '');
   const descubrir = useDescubrirViewModel();
+  const insig = useInsigniasViewModel(perfil?.cliente_id ?? '');
+  const medallas = insig.state.status === 'listo'
+    ? [...insig.state.insignias].sort((a, b) => Number(b.obtenida) - Number(a.obtenida)).slice(0, 6)
+    : [];
+  const medTotal = insig.state.status === 'listo' ? insig.state.total : 0;
+  const medDe = insig.state.status === 'listo' ? insig.state.insignias.length : 0;
 
   const verDetalle = (id: string, nombre: string) =>
     navigation.navigate('DetalleNegocio', { negocioId: id, nombre });
@@ -27,6 +40,23 @@ export function MisNegociosScreen() {
     <Screen scroll>
       <AppText variant="caption" color={colors.textSecondary}>Hola,</AppText>
       <AppText variant="title">{perfil?.nombre ?? 'Cliente'} 👋</AppText>
+
+      {/* Preview del medallero → toca para ver todo */}
+      {medallas.length > 0 && (
+        <Pressable style={styles.medallero} onPress={() => navigation.navigate('Insignias')}>
+          <View style={styles.medFila}>
+            <AppText variant="subtitle">🏆 Medallero</AppText>
+            <AppText variant="caption" color={colors.primary} style={styles.bold}>{medTotal}/{medDe} · Ver todo ›</AppText>
+          </View>
+          <View style={styles.medRow}>
+            {medallas.map(m => (
+              <View key={m.id} style={[styles.mini, m.obtenida ? styles.miniOn : styles.miniOff]}>
+                <AppText style={styles.miniEmoji}>{m.obtenida ? emoji(m.icono) : '🔒'}</AppText>
+              </View>
+            ))}
+          </View>
+        </Pressable>
+      )}
 
       {state.status === 'cargando' && <ActivityIndicator color={colors.primary} style={styles.loader} />}
       {state.status === 'error' && <AppText color={colors.danger}>{state.mensaje}</AppText>}
@@ -102,6 +132,14 @@ export function MisNegociosScreen() {
 
 const styles = StyleSheet.create({
   loader: { marginTop: spacing.lg },
+  bold: { fontWeight: '700' },
+  medallero: { backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.md, marginTop: spacing.lg },
+  medFila: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
+  medRow: { flexDirection: 'row', gap: spacing.sm },
+  mini: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
+  miniOn: { backgroundColor: '#FFF6E0', borderColor: colors.gold },
+  miniOff: { backgroundColor: colors.white, borderColor: colors.border, opacity: 0.7 },
+  miniEmoji: { fontSize: 20 },
   negocio: { marginBottom: spacing.md },
   negocioFila: { flexDirection: 'row', alignItems: 'center' },
   flex: { flex: 1 },
