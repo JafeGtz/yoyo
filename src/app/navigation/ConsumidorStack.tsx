@@ -12,6 +12,7 @@ import { RetosScreen } from '../../features/retos/view/RetosScreen';
 import { RifasScreen } from '../../features/rifas/view/RifasScreen';
 import { RecompensasScreen } from '../../features/recompensas/view/RecompensasScreen';
 import { CarneFanScreen } from '../../features/carne/view/CarneFanScreen';
+import { RankingScreen } from '../../features/ranking/view/RankingScreen';
 import { PremioPopup } from '../../features/premios/view/PremioPopup';
 import { ResenaScreen } from '../../features/resena/view/ResenaScreen';
 import { CitaScreen } from '../../features/cita/view/CitaScreen';
@@ -35,6 +36,7 @@ export function ConsumidorStack() {
       <Stack.Screen name="Rifas" component={RifasScreen} />
       <Stack.Screen name="Recompensas" component={RecompensasScreen} />
       <Stack.Screen name="CarneFan" component={CarneFanScreen} />
+      <Stack.Screen name="Ranking" component={RankingScreen} />
       <Stack.Screen name="Resena" component={ResenaScreen} options={{ presentation: 'modal' }} />
       <Stack.Screen name="Cita" component={CitaScreen} />
     </Stack.Navigator>

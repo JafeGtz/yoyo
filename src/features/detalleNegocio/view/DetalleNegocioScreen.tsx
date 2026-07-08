@@ -218,7 +218,7 @@ export function DetalleNegocioScreen() {
       {/* Ranking del mes */}
       {d.ranking.length > 0 && (
         <>
-          <SectionHeader titulo="Top del mes" />
+          <SectionHeader titulo="Top del mes" onVerTodo={() => navigation.navigate('Ranking', { negocioId: d.negocio.id, nombre: d.negocio.nombre })} />
           <SoftCard>
             {d.ranking.map((r, i) => {
               const yo = r.cliente_id === (perfil?.cliente_id ?? '');
