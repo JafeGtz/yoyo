@@ -5,15 +5,16 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { HeroCard } from '../../../shared/ui/HeroCard';
 import { ProgressBar } from '../../../shared/ui/ProgressBar';
+import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { colors, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useInsigniasViewModel } from '../viewmodel/useInsigniasViewModel';
 
-const ICONOS: Record<string, string> = {
-  sparkle: '✨', medal: '🥇', trophy: '🏆', sunrise: '🌅', moon: '🌙',
-  users: '👥', cake: '🎂', compass: '🧭', flame: '🔥', crown: '👑',
+const ICONOS: Record<string, IconName> = {
+  sparkle: 'sparkles', medal: 'medal', trophy: 'trophy', sunrise: 'sunrise', moon: 'moon',
+  users: 'users', cake: 'cake', compass: 'compass', flame: 'flame', crown: 'crown',
 };
-const emoji = (icono: string | null) => (icono && ICONOS[icono]) || '🏅';
+const iconOf = (icono: string | null): IconName => (icono && ICONOS[icono]) || 'medal';
 
 export function InsigniasScreen() {
   const navigation = useNavigation();
@@ -41,7 +42,7 @@ export function InsigniasScreen() {
           {/* Resumen tipo trofeo */}
           <HeroCard style={styles.hero}>
             <View style={styles.heroFila}>
-              <AppText variant="hero">🏆</AppText>
+              <Icon name="trophy" size={40} color={colors.gold} />
               <View style={styles.heroTxt}>
                 <AppText variant="title" color="#fff">{total} de {de}</AppText>
                 <AppText variant="caption" color="rgba(255,255,255,0.85)">insignias desbloqueadas</AppText>
@@ -57,7 +58,7 @@ export function InsigniasScreen() {
             {insignias.map(i => (
               <View key={i.id} style={styles.item}>
                 <View style={[styles.medalla, i.obtenida ? styles.medallaOn : styles.medallaOff]}>
-                  <AppText style={styles.medallaEmoji}>{i.obtenida ? emoji(i.icono) : '🔒'}</AppText>
+                  <Icon name={i.obtenida ? iconOf(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.gold : colors.textSecondary} />
                 </View>
                 <AppText
                   variant="caption"

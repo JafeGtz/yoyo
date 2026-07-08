@@ -6,6 +6,7 @@ import { AppText } from '../../../shared/ui/AppText';
 import { Card } from '../../../shared/ui/Card';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
+import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisNegociosViewModel } from '../viewmodel/useMisNegociosViewModel';
@@ -13,11 +14,11 @@ import { useDescubrirViewModel, type NegocioDir } from '../../descubrir/viewmode
 import { useInsigniasViewModel } from '../../insignias/viewmodel/useInsigniasViewModel';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
-const ICONOS: Record<string, string> = {
-  sparkle: '✨', medal: '🥇', trophy: '🏆', sunrise: '🌅', moon: '🌙',
-  users: '👥', cake: '🎂', compass: '🧭', flame: '🔥', crown: '👑',
+const ICONOS: Record<string, IconName> = {
+  sparkle: 'sparkles', medal: 'medal', trophy: 'trophy', sunrise: 'sunrise', moon: 'moon',
+  users: 'users', cake: 'cake', compass: 'compass', flame: 'flame', crown: 'crown',
 };
-const emoji = (icono: string | null) => (icono && ICONOS[icono]) || '🏅';
+const iconOf = (icono: string | null): IconName => (icono && ICONOS[icono]) || 'medal';
 
 export function MisNegociosScreen() {
   const { perfil } = useSession();
@@ -39,19 +40,22 @@ export function MisNegociosScreen() {
   return (
     <Screen scroll>
       <AppText variant="caption" color={colors.textSecondary}>Hola,</AppText>
-      <AppText variant="title">{perfil?.nombre ?? 'Cliente'} 👋</AppText>
+      <AppText variant="title">{perfil?.nombre ?? 'Cliente'}</AppText>
 
       {/* Preview del medallero → toca para ver todo */}
       {medallas.length > 0 && (
         <Pressable style={styles.medallero} onPress={() => navigation.navigate('Insignias')}>
           <View style={styles.medFila}>
-            <AppText variant="subtitle">🏆 Medallero</AppText>
+            <View style={styles.medTit}>
+              <Icon name="trophy" size={18} color={colors.gold} />
+              <AppText variant="subtitle">Medallero</AppText>
+            </View>
             <AppText variant="caption" color={colors.primary} style={styles.bold}>{medTotal}/{medDe} · Ver todo ›</AppText>
           </View>
           <View style={styles.medRow}>
             {medallas.map(m => (
               <View key={m.id} style={[styles.mini, m.obtenida ? styles.miniOn : styles.miniOff]}>
-                <AppText style={styles.miniEmoji}>{m.obtenida ? emoji(m.icono) : '🔒'}</AppText>
+                <Icon name={m.obtenida ? iconOf(m.icono) : 'lock'} size={20} color={m.obtenida ? colors.gold : colors.textSecondary} />
               </View>
             ))}
           </View>
@@ -87,7 +91,7 @@ export function MisNegociosScreen() {
                   <AppText variant="caption" color={n.proximoBeneficio ? colors.primary : colors.textSecondary}>
                     {n.proximoBeneficio
                       ? `Faltan ${n.visitasParaProximoBeneficio} para ${n.proximoBeneficio}`
-                      : '¡Todo desbloqueado aquí! 🎉'}
+                      : '¡Todo desbloqueado aquí!'}
                   </AppText>
                 </Card>
               </Pressable>
@@ -100,7 +104,7 @@ export function MisNegociosScreen() {
       {sinNegocios && (
         <View>
           <AppText variant="body" color={colors.textSecondary} style={styles.intro}>
-            Aún no has visitado ningún negocio. ¡Descubre lugares y empieza a ganar! 🎁
+            Aún no has visitado ningún negocio. ¡Descubre lugares y empieza a ganar!
           </AppText>
           <SectionHeader titulo="Negocios para visitar" onVerTodo={() => navigation.navigate('Descubrir' as never)} />
 
@@ -135,6 +139,7 @@ const styles = StyleSheet.create({
   bold: { fontWeight: '700' },
   medallero: { backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.md, marginTop: spacing.lg },
   medFila: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
+  medTit: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   medRow: { flexDirection: 'row', gap: spacing.sm },
   mini: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
   miniOn: { backgroundColor: '#FFF6E0', borderColor: colors.gold },

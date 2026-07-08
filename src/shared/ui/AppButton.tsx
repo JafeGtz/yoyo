@@ -1,6 +1,7 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View, ViewStyle } from 'react-native';
 import { AppText } from './AppText';
+import { Icon, type IconName } from './Icon';
 import { colors, radii, spacing } from '../theme';
 
 interface Props {
@@ -9,11 +10,13 @@ interface Props {
   cargando?: boolean;
   variante?: 'primario' | 'secundario';
   deshabilitado?: boolean;
+  icono?: IconName;
   style?: ViewStyle;
 }
 
-export function AppButton({ titulo, onPress, cargando, variante = 'primario', deshabilitado, style }: Props) {
+export function AppButton({ titulo, onPress, cargando, variante = 'primario', deshabilitado, icono, style }: Props) {
   const esPrimario = variante === 'primario';
+  const colorTexto = esPrimario ? '#fff' : colors.primary;
   return (
     <Pressable
       onPress={onPress}
@@ -27,11 +30,12 @@ export function AppButton({ titulo, onPress, cargando, variante = 'primario', de
       ]}
     >
       {cargando ? (
-        <ActivityIndicator color={esPrimario ? '#fff' : colors.primary} />
+        <ActivityIndicator color={colorTexto} />
       ) : (
-        <AppText variant="subtitle" color={esPrimario ? '#fff' : colors.primary}>
-          {titulo}
-        </AppText>
+        <View style={styles.fila}>
+          {icono && <Icon name={icono} size={20} color={colorTexto} />}
+          <AppText variant="subtitle" color={colorTexto}>{titulo}</AppText>
+        </View>
       )}
     </Pressable>
   );
@@ -45,6 +49,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
+  fila: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   primario: { backgroundColor: colors.primary },
   secundario: {
     backgroundColor: colors.white,

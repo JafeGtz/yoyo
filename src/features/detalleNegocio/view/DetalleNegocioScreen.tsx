@@ -109,8 +109,8 @@ export function DetalleNegocioScreen() {
               <MedidorVisitas visitas={d.visitasTotales} hitos={d.hitos} sobreOscuro />
               <AppText variant="caption" color={colors.mint} style={styles.faltan}>
                 {d.faltanProximo != null
-                  ? `🎯 Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
-                  : '🎁 ¡Ya desbloqueaste todos los de visitas!'}
+                  ? `Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
+                  : "¡Ya desbloqueaste todos los de visitas!"}
               </AppText>
             </>
           )}
@@ -120,7 +120,8 @@ export function DetalleNegocioScreen() {
 
       {/* Compartir carné de fan */}
       <AppButton
-        titulo="📸 Compartir mi carné de fan"
+        icono="camera"
+        titulo="Compartir mi carné de fan"
         variante="secundario"
         style={styles.ruletaBtn}
         onPress={() => navigation.navigate('CarneFan', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
@@ -129,7 +130,8 @@ export function DetalleNegocioScreen() {
       {/* Gira y Gana */}
       {d.tieneRuleta && (
         <AppButton
-          titulo="🎡 Gira y Gana"
+          icono="wheel"
+          titulo="Gira y Gana"
           variante="secundario"
           style={styles.ruletaBtn}
           onPress={() => navigation.navigate('Ruleta', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
@@ -139,7 +141,8 @@ export function DetalleNegocioScreen() {
       {/* Rasca y Gana */}
       {d.tieneRasca && (
         <AppButton
-          titulo="🪙 Rasca y Gana"
+          icono="coin"
+          titulo="Rasca y Gana"
           variante="secundario"
           style={styles.ruletaBtn}
           onPress={() => navigation.navigate('Rasca', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
@@ -149,7 +152,8 @@ export function DetalleNegocioScreen() {
       {/* Retos */}
       {d.tieneRetos && (
         <AppButton
-          titulo="🎯 Retos"
+          icono="target"
+          titulo="Retos"
           variante="secundario"
           style={styles.ruletaBtn}
           onPress={() => navigation.navigate('Retos', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
@@ -159,7 +163,8 @@ export function DetalleNegocioScreen() {
       {/* Rifas */}
       {d.tieneRifas && (
         <AppButton
-          titulo="🎁 Rifas"
+          icono="gift"
+          titulo="Rifas"
           variante="secundario"
           style={styles.ruletaBtn}
           onPress={() => navigation.navigate('Rifas', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
@@ -169,7 +174,8 @@ export function DetalleNegocioScreen() {
       {/* Agendar cita */}
       {d.negocio.citas_modo !== 'desactivado' && (
         <AppButton
-          titulo="📅 Agendar cita"
+          icono="calendar"
+          titulo="Agendar cita"
           style={styles.ruletaBtn}
           onPress={() => navigation.navigate('Cita', {
             negocioId: d.negocio.id,
@@ -242,7 +248,7 @@ export function DetalleNegocioScreen() {
                 <View style={styles.gridFoto}>
                   {it.foto_url
                     ? <Image source={{ uri: it.foto_url }} style={styles.fotoImg} resizeMode="cover" />
-                    : <AppText variant="hero">🛍️</AppText>}
+                    : <Icon name="bag" size={34} color={colors.textSecondary} />}
                 </View>
                 <AppText variant="caption" numberOfLines={1} style={styles.gridNombre}>{it.nombre}</AppText>
                 {it.precio != null && <AppText variant="subtitle" color={colors.primary}>${it.precio}</AppText>}

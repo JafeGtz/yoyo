@@ -2,15 +2,15 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { AppText } from '../../shared/ui/AppText';
+import { Icon, type IconName } from '../../shared/ui/Icon';
 import { cardShadow, colors, radii, spacing } from '../../shared/theme';
 
-const ICONOS: Record<string, string> = {
-  Inicio: '🏠',
-  Beneficios: '🎁',
-  Escanear: '⛶',
-  Descubrir: '🏪',
-  Perfil: '👤',
+const ICONOS: Record<string, IconName> = {
+  Inicio: 'home',
+  Beneficios: 'gift',
+  Escanear: 'scan',
+  Descubrir: 'store',
+  Perfil: 'user',
 };
 
 /** Tab bar flotante con botón de escaneo central elevado (estilo UI Kit). */
@@ -32,7 +32,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
             return (
               <Pressable key={route.key} onPress={onPress} style={styles.fabWrap}>
                 <View style={styles.fab}>
-                  <AppText variant="title" color="#fff">{ICONOS.Escanear}</AppText>
+                  <Icon name="scan" size={26} color="#fff" />
                 </View>
               </Pressable>
             );
@@ -40,9 +40,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
 
           return (
             <Pressable key={route.key} onPress={onPress} style={styles.tab}>
-              <AppText variant="subtitle" color={activo ? colors.primary : colors.textSecondary}>
-                {ICONOS[route.name] ?? '•'}
-              </AppText>
+              <Icon name={ICONOS[route.name] ?? 'home'} size={24} color={activo ? colors.primary : colors.textSecondary} />
             </Pressable>
           );
         })}
