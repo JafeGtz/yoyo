@@ -6,6 +6,7 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { Confetti } from '../../../shared/ui/Confetti';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { supabase } from '../../../data/supabase/supabaseClient';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
@@ -66,7 +67,7 @@ export function RascaScreen() {
     }
     setPremio(data.premio);
     setGano(!!data.canjeable);
-    setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'Se agotó esta vez 😅' : '');
+    setDetalle(data.canjeable ? 'Ya está en tus beneficios' : data.agotado ? 'Se agotó esta vez' : '');
   }
 
   function revelar() {
@@ -129,7 +130,7 @@ export function RascaScreen() {
                 <AppText color={colors.danger} style={styles.center}>{error}</AppText>
               ) : (
                 <>
-                  <AppText variant="hero">{revelado ? (gano ? '🎉' : '🍀') : '🎁'}</AppText>
+                  <Icon name={revelado ? (gano ? 'trophy' : 'clover') : 'gift'} size={48} color={revelado && gano ? colors.gold : colors.textSecondary} />
                   {premio ? (
                     <>
                       {revelado && (
@@ -158,7 +159,7 @@ export function RascaScreen() {
                   </Defs>
                   <G mask="url(#scratch)">
                     <Rect x={0} y={0} width={W} height={H} rx={20} fill={colors.primary} />
-                    <SvgText x={W / 2} y={H / 2} fill="#fff" fontSize={17} fontWeight="700" textAnchor="middle">RASCA CON EL DEDO 🪙</SvgText>
+                    <SvgText x={W / 2} y={H / 2} fill="#fff" fontSize={17} fontWeight="700" textAnchor="middle">RASCA CON EL DEDO</SvgText>
                   </G>
                 </Svg>
               </View>
@@ -168,7 +169,7 @@ export function RascaScreen() {
           {revelado ? (
             <AppButton titulo="Listo" onPress={() => navigation.goBack()} style={styles.boton} />
           ) : (
-            <AppText variant="caption" color={colors.textSecondary} style={styles.hint}>👆 Desliza el dedo para rascar</AppText>
+            <AppText variant="caption" color={colors.textSecondary} style={styles.hint}>Desliza el dedo para rascar</AppText>
           )}
         </>
       )}

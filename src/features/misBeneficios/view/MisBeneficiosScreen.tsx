@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisBeneficiosViewModel } from '../viewmodel/useMisBeneficiosViewModel';
@@ -39,7 +40,7 @@ export function MisBeneficiosScreen() {
         <>
           {/* Banner de premios listos */}
           <View style={styles.banner}>
-            <AppText variant="hero">🎁</AppText>
+            <Icon name="gift" size={40} color="#fff" />
             <View style={styles.flex}>
               <AppText variant="title" color="#fff">{disponibles.length}</AppText>
               <AppText variant="caption" color="rgba(255,255,255,0.9)">
@@ -50,7 +51,7 @@ export function MisBeneficiosScreen() {
 
           {beneficios.length === 0 && (
             <AppText color={colors.textSecondary} style={styles.vacio}>
-              Aún no tienes premios. ¡Visita negocios y desbloquéalos! 🎯
+              Aún no tienes premios. ¡Visita negocios y desbloquéalos!
             </AppText>
           )}
 
@@ -61,7 +62,7 @@ export function MisBeneficiosScreen() {
             return (
               <View key={b.id} style={styles.ticket}>
                 <View style={styles.tira}>
-                  <AppText style={styles.tiraEmoji}>🎟️</AppText>
+                  <Icon name="ticket" size={26} color="#fff" />
                 </View>
                 <View style={styles.ticketBody}>
                   <AppText variant="subtitle" numberOfLines={1}>{b.beneficio?.nombre ?? '—'}</AppText>
@@ -85,7 +86,7 @@ export function MisBeneficiosScreen() {
               <AppText variant="subtitle" color={colors.textSecondary} style={styles.histTitulo}>Historial</AppText>
               {otros.map(b => (
                 <View key={b.id} style={styles.histFila}>
-                  <AppText style={styles.histEmoji}>{b.estado === 'canjeado' ? '✅' : '⌛'}</AppText>
+                  <Icon name={b.estado === 'canjeado' ? 'check' : 'alert'} size={20} color={colors.textSecondary} />
                   <View style={styles.flex}>
                     <AppText variant="body" color={colors.textSecondary} numberOfLines={1}>{b.beneficio?.nombre ?? '—'}</AppText>
                     <AppText variant="caption" color={colors.textSecondary}>{b.negocio?.nombre ?? ''} · {ESTADO[b.estado] ?? b.estado}</AppText>

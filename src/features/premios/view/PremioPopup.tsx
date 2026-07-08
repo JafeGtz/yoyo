@@ -3,6 +3,7 @@ import { Animated, Easing, Modal, Pressable, StyleSheet, View } from 'react-nati
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { Confetti } from '../../../shared/ui/Confetti';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { supabase } from '../../../data/supabase/supabaseClient';
@@ -69,12 +70,12 @@ export function PremioPopup() {
         {confeti && <Confetti />}
         <View style={styles.hoja}>
           {!abierto ? (
-            <Animated.Text style={[styles.cofre, { transform: [{ rotate }, { scale: cofreScale }], opacity: cofreOp }]}>
-              🎁
-            </Animated.Text>
+            <Animated.View style={{ transform: [{ rotate }, { scale: cofreScale }], opacity: cofreOp }}>
+              <Icon name="gift" size={96} color={colors.primary} />
+            </Animated.View>
           ) : (
             <Animated.View style={{ alignItems: 'center', alignSelf: 'stretch', transform: [{ scale: premioScale }] }}>
-              <AppText variant="hero">🎉</AppText>
+              <Icon name="trophy" size={52} color={colors.gold} />
               <AppText variant="title" color={colors.primary}>¡Ganaste!</AppText>
               {premios.map(p => (
                 <View key={p.id} style={styles.item}>

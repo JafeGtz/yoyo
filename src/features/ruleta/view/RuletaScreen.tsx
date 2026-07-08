@@ -6,6 +6,7 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { Confetti } from '../../../shared/ui/Confetti';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, spacing } from '../../../shared/theme';
 import { supabase } from '../../../data/supabase/supabaseClient';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
@@ -92,7 +93,7 @@ export function RuletaScreen() {
       .start(() => {
         setPremio(data.premio);
         setGano(!!data.canjeable);
-        setDetalle(data.canjeable ? '🎁 Ya está en tus beneficios' : data.agotado ? 'Se agotó esta vez 😅' : '');
+        setDetalle(data.canjeable ? 'Ya está en tus beneficios' : data.agotado ? 'Se agotó esta vez' : '');
         setEstado('resultado');
       });
   }
@@ -138,13 +139,13 @@ export function RuletaScreen() {
                 );
               })}
               <Circle cx={R} cy={R} r={26} fill="#fff" stroke={colors.primary} strokeWidth={4} />
-              <SvgText x={R} y={R + 6} fontSize={20} textAnchor="middle">🎡</SvgText>
+              
             </Svg>
           </Animated.View>
 
           {estado === 'resultado' && premio && (
             <View style={styles.resultado}>
-              <AppText variant="hero">{gano ? '🎉' : '🍀'}</AppText>
+              <Icon name={gano ? 'trophy' : 'clover'} size={48} color={gano ? colors.gold : colors.textSecondary} />
               <AppText variant="title" color={gano ? colors.primary : colors.textSecondary}>{gano ? '¡Ganaste!' : '¡Casi!'}</AppText>
               <AppText variant="subtitle">{premio}</AppText>
               {detalle ? <AppText variant="caption" color={colors.textSecondary} style={styles.sub}>{detalle}</AppText> : null}

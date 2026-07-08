@@ -6,6 +6,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { supabase } from '../../../data/supabase/supabaseClient';
@@ -65,7 +66,7 @@ export function CarneFanScreen() {
     setCompartiendo(true);
     try {
       const uri = await captureRef(cardRef, { format: 'png', quality: 0.98, result: 'data-uri' });
-      await Share.open({ url: uri, message: `¡Soy fan de ${d?.negocio} en yoyo! 🎉`, failOnCancel: false });
+      await Share.open({ url: uri, message: `¡Soy fan de ${d?.negocio} en yoyo!`, failOnCancel: false });
     } catch { /* cancelado */ }
     setCompartiendo(false);
   }
@@ -83,7 +84,7 @@ export function CarneFanScreen() {
     <Screen scroll>
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}><AppText variant="title" color={colors.primary}>‹</AppText></Pressable>
       <AppText variant="title">Tu carné</AppText>
-      <AppText variant="body" color={colors.textSecondary} style={styles.sub}>Compártelo en tus stories 📸</AppText>
+      <AppText variant="body" color={colors.textSecondary} style={styles.sub}>Compártelo en tus stories</AppText>
 
       {/* CARD compartible */}
       <View ref={cardRef} collapsable={false} style={styles.card}>
@@ -104,8 +105,9 @@ export function CarneFanScreen() {
             </View>
             <AppText variant="title" color="#fff" style={styles.negNombre}>{d.negocio}</AppText>
             <View style={styles.badge}>
+              <Icon name={d.clienteDelMes ? 'crown' : 'star'} size={18} color="#fff" />
               <AppText variant="subtitle" color="#fff">
-                {d.clienteDelMes ? '👑 Cliente del mes' : `⭐ Fan · Nivel ${d.nivel}`}
+                {d.clienteDelMes ? 'Cliente del mes' : `Fan · Nivel ${d.nivel}`}
               </AppText>
             </View>
           </View>
@@ -123,7 +125,7 @@ export function CarneFanScreen() {
         </View>
       </View>
 
-      <AppButton titulo={compartiendo ? 'Preparando…' : '📤 Compartir'} onPress={compartir} cargando={compartiendo} style={styles.boton} />
+      <AppButton titulo={compartiendo ? 'Preparando…' : 'Compartir'} icono={compartiendo ? undefined : 'share'} onPress={compartir} cargando={compartiendo} style={styles.boton} />
     </Screen>
   );
 }
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
   logo: { width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   logoImg: { width: 88, height: 88 },
   negNombre: { textAlign: 'center' },
-  badge: { backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: radii.pill, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: radii.pill, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
   stats: { flexDirection: 'row', justifyContent: 'space-around' },
   stat: { alignItems: 'center' },
   statN: { fontSize: 26 },
