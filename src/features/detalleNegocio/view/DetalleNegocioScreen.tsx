@@ -199,9 +199,14 @@ export function DetalleNegocioScreen() {
       {/* Historial */}
       {d.visitas.length > 0 && (
         <>
-          <SectionHeader titulo="Tu historial" />
+          <SectionHeader
+            titulo="Tu historial"
+            onVerTodo={d.visitas.length > 3
+              ? () => navigation.navigate('Historial', { negocioId: d.negocio.id, nombre: d.negocio.nombre })
+              : undefined}
+          />
           <SoftCard>
-            {d.visitas.map((v, i) => (
+            {d.visitas.slice(0, 3).map((v, i) => (
               <View key={v.id} style={[styles.historialFila, i > 0 && styles.divisor]}>
                 <AppText variant="body" color={colors.textSecondary}>
                   {new Date(v.creado_en).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}

@@ -14,6 +14,7 @@ export type ConsumidorStackParams = {
   CarneFan: { negocioId: string; nombre: string };
   Ranking: { negocioId: string; nombre: string };
   Catalogo: { negocioId: string; nombre: string };
+  Historial: { negocioId: string; nombre: string };
   Resena: { negocioId: string; nombre: string };
   Cita: { negocioId: string; nombre: string; modo: 'solicitud' | 'agenda' };
 };

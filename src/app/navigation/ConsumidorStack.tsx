@@ -14,6 +14,7 @@ import { RecompensasScreen } from '../../features/recompensas/view/RecompensasSc
 import { CarneFanScreen } from '../../features/carne/view/CarneFanScreen';
 import { RankingScreen } from '../../features/ranking/view/RankingScreen';
 import { CatalogoScreen } from '../../features/catalogo/view/CatalogoScreen';
+import { HistorialScreen } from '../../features/historial/view/HistorialScreen';
 import { PremioPopup } from '../../features/premios/view/PremioPopup';
 import { ResenaScreen } from '../../features/resena/view/ResenaScreen';
 import { CitaScreen } from '../../features/cita/view/CitaScreen';
@@ -39,6 +40,7 @@ export function ConsumidorStack() {
       <Stack.Screen name="CarneFan" component={CarneFanScreen} />
       <Stack.Screen name="Ranking" component={RankingScreen} />
       <Stack.Screen name="Catalogo" component={CatalogoScreen} />
+      <Stack.Screen name="Historial" component={HistorialScreen} />
       <Stack.Screen name="Resena" component={ResenaScreen} options={{ presentation: 'modal' }} />
       <Stack.Screen name="Cita" component={CitaScreen} />
     </Stack.Navigator>
