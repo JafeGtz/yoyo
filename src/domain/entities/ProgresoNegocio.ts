@@ -13,4 +13,6 @@ export interface ProgresoNegocio {
   proximoBeneficio?: string;
   /** Umbral del beneficio anterior ya alcanzado (para medir la barra de hito a hito). */
   desdeVisitas?: number;
+  /** Umbrales de visitas de los beneficios (hitos del medidor). */
+  hitos?: number[];
 }

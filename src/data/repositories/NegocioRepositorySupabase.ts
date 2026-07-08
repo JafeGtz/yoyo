@@ -28,6 +28,7 @@ export class NegocioRepositorySupabase implements NegocioRepository {
     // Próximo beneficio por negocio (siguiente umbral no alcanzado) + umbral previo.
     const proximos = new Map<string, { nombre: string; faltan: number }>();
     const desdePorNegocio = new Map<string, number>();
+    const hitosPorNegocio = new Map<string, number[]>();
     if (negocioIds.length > 0) {
       const { data: benes } = await supabase
         .from('beneficio')
@@ -38,6 +39,7 @@ export class NegocioRepositorySupabase implements NegocioRepository {
 
       for (const f of filas) {
         const delNegocio = (benes ?? []).filter(b => b.negocio_id === f.negocio!.id);
+        hitosPorNegocio.set(f.negocio!.id, delNegocio.map(b => b.condicion_visitas!));
         const candidatos = delNegocio
           .filter(b => b.condicion_visitas! > f.visitas_totales)
           .sort((a, b) => a.condicion_visitas! - b.condicion_visitas!);
@@ -69,6 +71,7 @@ export class NegocioRepositorySupabase implements NegocioRepository {
         proximoBeneficio: prox?.nombre,
         visitasParaProximoBeneficio: prox?.faltan,
         desdeVisitas: desdePorNegocio.get(f.negocio!.id) ?? 0,
+        hitos: hitosPorNegocio.get(f.negocio!.id) ?? [],
       };
     });
 

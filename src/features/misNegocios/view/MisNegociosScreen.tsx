@@ -4,7 +4,7 @@ import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Card } from '../../../shared/ui/Card';
-import { ProgressBar } from '../../../shared/ui/ProgressBar';
+import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -36,9 +36,6 @@ export function MisNegociosScreen() {
         <>
           <SectionHeader titulo="Mis negocios" />
           {state.negocios.map(n => {
-            const desde = n.desdeVisitas ?? 0;
-            const meta = n.visitasTotales + (n.visitasParaProximoBeneficio ?? 0);
-            const prog = meta > desde ? (n.visitasTotales - desde) / (meta - desde) : 1;
             return (
               <Pressable key={n.negocio.id} onPress={() => verDetalle(n.negocio.id, n.negocio.nombre)}>
                 <Card style={styles.negocio}>
@@ -55,14 +52,7 @@ export function MisNegociosScreen() {
                     </View>
                   </View>
                   <View style={styles.barra}>
-                    <ProgressBar valor={prog} color={colors.primary} trackColor={colors.surface} />
-                    {/* Escala tipo regla: hito previo → meta */}
-                    <View style={styles.regla}>
-                      <AppText variant="caption" color={colors.textSecondary}>{desde}</AppText>
-                      <AppText variant="caption" color={colors.textSecondary}>
-                        {n.proximoBeneficio ? `${meta} visitas` : 'máx'}
-                      </AppText>
-                    </View>
+                    <MedidorVisitas visitas={n.visitasTotales} hitos={n.hitos ?? []} />
                   </View>
                   <AppText variant="caption" color={n.proximoBeneficio ? colors.primary : colors.textSecondary}>
                     {n.proximoBeneficio
