@@ -6,6 +6,7 @@ export interface Perfil {
   cliente_id?: string;
   negocio_id?: string;
   nombre?: string;
+  foto_url?: string | null;
 }
 
 export async function registrarConsumidor(params: {

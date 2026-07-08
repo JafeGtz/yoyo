@@ -58,6 +58,7 @@ export function MisNegociosScreen() {
   return (
     <Screen scroll>
       <View style={styles.homeHeader}>
+        {perfil?.foto_url ? <Image source={{ uri: perfil.foto_url }} style={styles.avatarHome} /> : null}
         <View style={styles.flex}>
           <AppText variant="caption" color={colors.textSecondary}>Hola,</AppText>
           <AppText variant="title">{perfil?.nombre ?? 'Cliente'}</AppText>
@@ -172,7 +173,8 @@ export function MisNegociosScreen() {
 const styles = StyleSheet.create({
   loader: { marginTop: spacing.lg },
   bold: { fontWeight: '700' },
-  homeHeader: { flexDirection: 'row', alignItems: 'center' },
+  homeHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  avatarHome: { width: 46, height: 46, borderRadius: 23, backgroundColor: colors.surface },
   campana: {
     width: 46, height: 46, borderRadius: 23, backgroundColor: colors.lavender,
     alignItems: 'center', justifyContent: 'center',

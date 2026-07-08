@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppInput } from '../../../shared/ui/AppInput';
 import { AppButton } from '../../../shared/ui/AppButton';
-import { colors, spacing } from '../../../shared/theme';
+import { AVATARES } from '../../../shared/avatars';
+import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { cerrarSesion } from '../../../core/auth/authService';
 import { supabase } from '../../../data/supabase/supabaseClient';
@@ -16,17 +17,19 @@ export function EditarPerfilScreen() {
   const [nombre, setNombre] = useState('');
   const [celular, setCelular] = useState('');
   const [cumpleanos, setCumpleanos] = useState('');
+  const [foto, setFoto] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
     if (!perfil?.cliente_id) return;
-    supabase.from('cliente').select('nombre, celular, cumpleanos').eq('id', perfil.cliente_id).single()
+    supabase.from('cliente').select('nombre, celular, cumpleanos, foto_url').eq('id', perfil.cliente_id).single()
       .then(({ data }) => {
         if (data) {
           setNombre(data.nombre ?? '');
           setCelular(data.celular ?? '');
           setCumpleanos(data.cumpleanos ?? '');
+          setFoto(data.foto_url ?? null);
         }
       });
   }, [perfil?.cliente_id]);
@@ -35,7 +38,7 @@ export function EditarPerfilScreen() {
     setGuardando(true);
     setMsg('');
     const { error } = await supabase.from('cliente')
-      .update({ nombre, celular: celular || null, cumpleanos: cumpleanos || null })
+      .update({ nombre, celular: celular || null, cumpleanos: cumpleanos || null, foto_url: foto })
       .eq('id', perfil?.cliente_id);
     setGuardando(false);
     if (error) setMsg(error.message);
@@ -72,6 +75,16 @@ export function EditarPerfilScreen() {
       </Pressable>
       <AppText variant="title">Datos personales</AppText>
 
+      {/* Selección de avatar */}
+      <AppText variant="subtitle" style={styles.avatarTit}>Elige tu avatar</AppText>
+      <View style={styles.avatares}>
+        {AVATARES.map(url => (
+          <Pressable key={url} onPress={() => setFoto(url)} style={[styles.avatarWrap, foto === url && styles.avatarSel]}>
+            <Image source={{ uri: url }} style={styles.avatarImg} />
+          </Pressable>
+        ))}
+      </View>
+
       <View style={styles.form}>
         <AppInput label="Nombre" value={nombre} onChangeText={setNombre} />
         <AppInput label="Celular" value={celular} onChangeText={setCelular} keyboardType="phone-pad" />
@@ -95,6 +108,11 @@ export function EditarPerfilScreen() {
 }
 
 const styles = StyleSheet.create({
+  avatarTit: { marginTop: spacing.lg, marginBottom: spacing.sm },
+  avatares: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  avatarWrap: { width: 60, height: 60, borderRadius: 30, borderWidth: 2, borderColor: 'transparent', overflow: 'hidden', backgroundColor: colors.surface },
+  avatarSel: { borderColor: colors.primary },
+  avatarImg: { width: '100%', height: '100%' },
   form: { marginTop: spacing.lg },
   msg: { marginBottom: spacing.md },
   peligro: { marginTop: spacing.xl * 2, alignItems: 'center' },

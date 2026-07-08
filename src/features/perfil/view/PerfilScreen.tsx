@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -47,7 +47,9 @@ export function PerfilScreen() {
             </AppText>
           </View>
           <View style={styles.avatar}>
-            <AppText variant="title" color="#fff">{(perfil?.nombre ?? 'C').charAt(0).toUpperCase()}</AppText>
+            {perfil?.foto_url
+              ? <Image source={{ uri: perfil.foto_url }} style={styles.avatarImg} />
+              : <AppText variant="title" color="#fff">{(perfil?.nombre ?? 'C').charAt(0).toUpperCase()}</AppText>}
           </View>
         </View>
       </HeroCard>
@@ -109,8 +111,9 @@ const styles = StyleSheet.create({
   avatar: {
     width: 60, height: 60, borderRadius: 30,
     backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
+  avatarImg: { width: '100%', height: '100%' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.lg },
   gridWrap: { width: '47%' },
   gridItem: { alignItems: 'center', paddingVertical: spacing.lg },
