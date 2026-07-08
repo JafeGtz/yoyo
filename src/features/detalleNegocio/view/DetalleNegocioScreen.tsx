@@ -8,6 +8,7 @@ import { HeroCard } from '../../../shared/ui/HeroCard';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { CodigoCanjeModal } from '../../misBeneficios/view/CodigoCanjeModal';
@@ -53,7 +54,7 @@ export function DetalleNegocioScreen() {
       {/* Ubicación */}
       {d.negocio.direccion && (
         <View style={styles.direccionRow}>
-          <AppText style={styles.direccionPin}>📍</AppText>
+          <Icon name="map" size={16} color={colors.primary} />
           <AppText variant="caption" color={colors.textSecondary} style={styles.flex}>{d.negocio.direccion}</AppText>
         </View>
       )}
@@ -62,7 +63,7 @@ export function DetalleNegocioScreen() {
       <View style={styles.acciones}>
         {d.negocio.telefono && (
           <Pressable style={styles.accionTile} onPress={() => Linking.openURL(`tel:${d.negocio.telefono}`)}>
-            <View style={[styles.accionIcon, { backgroundColor: colors.mintSoft }]}><AppText style={styles.accionEmoji}>📞</AppText></View>
+            <View style={[styles.accionIcon, { backgroundColor: colors.mintSoft }]}><Icon name="phone" size={20} color="#159A78" /></View>
             <AppText variant="caption" style={styles.accionLabel}>Llamar</AppText>
           </Pressable>
         )}
@@ -75,7 +76,7 @@ export function DetalleNegocioScreen() {
                 : `https://maps.google.com/?q=${encodeURIComponent(d.negocio.direccion ?? '')}`,
             )}
           >
-            <View style={[styles.accionIcon, { backgroundColor: colors.lavender }]}><AppText style={styles.accionEmoji}>🗺️</AppText></View>
+            <View style={[styles.accionIcon, { backgroundColor: colors.lavender }]}><Icon name="map" size={20} color={colors.primary} /></View>
             <AppText variant="caption" style={styles.accionLabel}>Cómo llegar</AppText>
           </Pressable>
         )}
@@ -84,7 +85,7 @@ export function DetalleNegocioScreen() {
             style={styles.accionTile}
             onPress={() => Linking.openURL(`https://wa.me/${d.negocio.telefono!.replace(/\D/g, '')}`)}
           >
-            <View style={[styles.accionIcon, { backgroundColor: '#DCF8E8' }]}><AppText style={styles.accionEmoji}>💬</AppText></View>
+            <View style={[styles.accionIcon, { backgroundColor: '#DCF8E8' }]}><Icon name="chat" size={20} color="#1EA362" /></View>
             <AppText variant="caption" style={styles.accionLabel}>WhatsApp</AppText>
           </Pressable>
         )}
