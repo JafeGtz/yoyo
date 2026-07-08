@@ -6,7 +6,6 @@ import { AppText } from '../../../shared/ui/AppText';
 import { Card, SoftCard } from '../../../shared/ui/Card';
 import { HeroCard } from '../../../shared/ui/HeroCard';
 import { AppButton } from '../../../shared/ui/AppButton';
-import { ProgressBar } from '../../../shared/ui/ProgressBar';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -34,6 +33,8 @@ export function DetalleNegocioScreen() {
 
   const d = state.data;
   const inicial = d.negocio.nombre.charAt(0).toUpperCase();
+  const pct = Math.round(d.progresoBeneficio * 100);
+  const knobLeft = Math.min(96, Math.max(2, pct));
 
   return (
     <Screen scroll>
@@ -74,14 +75,28 @@ export function DetalleNegocioScreen() {
             <AppText variant="caption" color="rgba(255,255,255,0.8)">visitas · Nivel {d.nivel}</AppText>
           </View>
         </View>
-        <View style={styles.heroProg}>
-          <ProgressBar valor={d.progresoBeneficio} />
-          <AppText variant="caption" color="rgba(255,255,255,0.8)" style={styles.heroSub}>
+        {/* Medidor de avance de visitas */}
+        <View style={styles.medidor}>
+          <View style={styles.medidorTop}>
+            <AppText variant="caption" color="rgba(255,255,255,0.85)">Avance a tu próximo premio</AppText>
+            <AppText variant="caption" color="#fff" style={styles.pct}>{pct}%</AppText>
+          </View>
+          <View style={styles.track}>
+            <View style={[styles.fill, { width: `${Math.max(pct, 3)}%` }]} />
+            <View style={[styles.knob, { left: `${knobLeft}%` }]} />
+          </View>
+          <View style={styles.escala}>
+            <AppText variant="caption" color="rgba(255,255,255,0.7)">{d.desdeVisitas} visitas</AppText>
+            <AppText variant="caption" color="rgba(255,255,255,0.7)">
+              {d.proximoNombre ? `${d.metaVisitas} visitas` : 'máx'}
+            </AppText>
+          </View>
+          <AppText variant="caption" color={colors.mint} style={styles.faltan}>
             {d.faltanProximo != null
-              ? `Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
+              ? `🎯 Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
               : d.beneficios.length > 0
-                ? `Tienes ${d.beneficios.length} beneficio${d.beneficios.length === 1 ? '' : 's'} listo${d.beneficios.length === 1 ? '' : 's'} 🎁`
-                : '¡Sigue visitando para ganar beneficios!'}
+                ? `🎁 Tienes ${d.beneficios.length} beneficio${d.beneficios.length === 1 ? '' : 's'} listo${d.beneficios.length === 1 ? '' : 's'}`
+                : '¡Sigue visitando para ganar!'}
           </AppText>
         </View>
       </HeroCard>
@@ -258,6 +273,22 @@ const styles = StyleSheet.create({
   visitas: { fontSize: 34, lineHeight: 38 },
   heroProg: { marginTop: spacing.md },
   heroSub: { marginTop: spacing.sm },
+  medidor: { marginTop: spacing.lg },
+  medidorTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: spacing.sm },
+  pct: { fontSize: 15, fontWeight: '800' },
+  track: {
+    height: 14, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.22)', justifyContent: 'center',
+  },
+  fill: {
+    position: 'absolute', left: 0, height: 14, borderRadius: 7, backgroundColor: colors.mint,
+  },
+  knob: {
+    position: 'absolute', width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff',
+    marginLeft: -10, borderWidth: 4, borderColor: colors.mint, top: -3,
+    shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 3,
+  },
+  escala: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.sm },
+  faltan: { marginTop: spacing.sm, fontWeight: '700' },
   item: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   gridItem: {

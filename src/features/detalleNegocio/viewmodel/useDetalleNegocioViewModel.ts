@@ -23,6 +23,8 @@ export interface DetalleNegocio {
   progresoBeneficio: number;
   faltanProximo: number | null;
   proximoNombre: string | null;
+  desdeVisitas: number;
+  metaVisitas: number;
   ranking: { cliente_id: string; nombre: string; visitas: number }[];
   tieneRuleta: boolean;
   tieneRasca: boolean;
@@ -95,6 +97,8 @@ export function useDetalleNegocioViewModel(negocioId: string, clienteId: string)
         progresoBeneficio,
         faltanProximo: prox ? prox.condicion_visitas - vt : null,
         proximoNombre: prox?.nombre ?? null,
+        desdeVisitas: desde,
+        metaVisitas: meta,
       },
     });
   }, [negocioId, clienteId]);
