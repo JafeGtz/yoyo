@@ -74,17 +74,23 @@ export function DetalleNegocioScreen() {
             <AppText variant="caption" color="rgba(255,255,255,0.8)">visitas · Nivel {d.nivel}</AppText>
           </View>
         </View>
-        {/* Medidor de visitas con hitos */}
-        {d.hitos.length > 0 && (
-          <View style={styles.medidor}>
-            <MedidorVisitas visitas={d.visitasTotales} hitos={d.hitos} sobreOscuro />
-            <AppText variant="caption" color={colors.mint} style={styles.faltan}>
-              {d.faltanProximo != null
-                ? `🎯 Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
-                : '🎁 ¡Ya desbloqueaste todos los beneficios!'}
-            </AppText>
-          </View>
-        )}
+        {/* Medidor de visitas (clickeable → línea de tiempo de recompensas) */}
+        <Pressable
+          style={styles.medidor}
+          onPress={() => navigation.navigate('Recompensas', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
+        >
+          {d.hitos.length > 0 && (
+            <>
+              <MedidorVisitas visitas={d.visitasTotales} hitos={d.hitos} sobreOscuro />
+              <AppText variant="caption" color={colors.mint} style={styles.faltan}>
+                {d.faltanProximo != null
+                  ? `🎯 Faltan ${d.faltanProximo} visita${d.faltanProximo === 1 ? '' : 's'} para ${d.proximoNombre}`
+                  : '🎁 ¡Ya desbloqueaste todos los de visitas!'}
+              </AppText>
+            </>
+          )}
+          <AppText variant="caption" color="#fff" style={styles.verTodas}>Ver todas las recompensas ›</AppText>
+        </Pressable>
       </HeroCard>
 
       {/* Gira y Gana */}
@@ -261,6 +267,7 @@ const styles = StyleSheet.create({
   heroSub: { marginTop: spacing.sm },
   medidor: { marginTop: spacing.lg },
   faltan: { marginTop: spacing.md, fontWeight: '700' },
+  verTodas: { marginTop: spacing.sm, fontWeight: '700', textDecorationLine: 'underline' },
   item: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   gridItem: {
