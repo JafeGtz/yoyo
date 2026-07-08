@@ -20,6 +20,16 @@ const ICONOS: Record<string, IconName> = {
 };
 const iconOf = (icono: string | null): IconName => (icono && ICONOS[icono]) || 'medal';
 
+// Paleta de acentos que combinan con el morado (menta, rosa, dorado, turquesa, coral).
+const ACENTOS = [
+  { fuerte: '#4F3CE0', suave: '#ECE9FC' },
+  { fuerte: '#34D6A8', suave: '#DAF6EE' },
+  { fuerte: '#FB3D93', suave: '#FEE1EE' },
+  { fuerte: '#F5B731', suave: '#FDF0D3' },
+  { fuerte: '#00BCD4', suave: '#D6F4F8' },
+  { fuerte: '#FF7A59', suave: '#FFE5DD' },
+];
+
 export function MisNegociosScreen() {
   const { perfil } = useSession();
   const navigation = useNavigation<NavigationProp<ConsumidorStackParams>>();
@@ -69,19 +79,23 @@ export function MisNegociosScreen() {
       {state.status === 'listo' && state.negocios.length > 0 && (
         <>
           <SectionHeader titulo="Mis negocios" />
-          {state.negocios.map(n => {
+          {state.negocios.map((n, i) => {
+            const ac = ACENTOS[i % ACENTOS.length];
             return (
               <Pressable key={n.negocio.id} onPress={() => verDetalle(n.negocio.id, n.negocio.nombre)}>
-                <Card style={styles.negocio}>
+                <Card style={[styles.negocio, { borderLeftWidth: 4, borderLeftColor: ac.fuerte }]}>
                   <View style={styles.negocioFila}>
+                    <View style={[styles.avatar, { backgroundColor: ac.fuerte }]}>
+                      <AppText variant="subtitle" color="#fff">{n.negocio.nombre.charAt(0).toUpperCase()}</AppText>
+                    </View>
                     <View style={styles.flex}>
                       <AppText variant="subtitle">{n.negocio.nombre}</AppText>
                       <AppText variant="caption" color={colors.textSecondary}>
                         {n.negocio.tipo} · Nivel {n.nivelActual}
                       </AppText>
                     </View>
-                    <View style={styles.visitasPill}>
-                      <AppText variant="subtitle" color={colors.primary}>{n.visitasTotales}</AppText>
+                    <View style={[styles.visitasPill, { backgroundColor: ac.suave }]}>
+                      <AppText variant="subtitle" color={ac.fuerte}>{n.visitasTotales}</AppText>
                       <AppText variant="caption" color={colors.textSecondary}>visitas</AppText>
                     </View>
                   </View>
@@ -111,12 +125,12 @@ export function MisNegociosScreen() {
           {descubrir.state.status === 'cargando' && <ActivityIndicator color={colors.primary} style={styles.loader} />}
           {descubrir.state.status === 'listo' && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.carrusel}>
-              {descubrir.state.negocios.map((n: NegocioDir) => (
+              {descubrir.state.negocios.map((n: NegocioDir, i: number) => (
                 <Pressable key={n.id} onPress={() => verDetalle(n.id, n.nombre)} style={styles.tarjeta}>
                   {n.portada_url ? (
                     <Image source={{ uri: n.portada_url }} style={styles.portada} />
                   ) : (
-                    <View style={[styles.portada, styles.portadaVacia]}>
+                    <View style={[styles.portada, styles.portadaVacia, { backgroundColor: ACENTOS[i % ACENTOS.length].fuerte }]}>
                       <AppText variant="hero" color="#fff">{n.nombre.charAt(0).toUpperCase()}</AppText>
                     </View>
                   )}
@@ -146,9 +160,10 @@ const styles = StyleSheet.create({
   miniOff: { backgroundColor: colors.white, borderColor: colors.border, opacity: 0.7 },
   miniEmoji: { fontSize: 20 },
   negocio: { marginBottom: spacing.md },
-  negocioFila: { flexDirection: 'row', alignItems: 'center' },
+  negocioFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  avatar: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
   flex: { flex: 1 },
-  visitasPill: { alignItems: 'center' },
+  visitasPill: { alignItems: 'center', borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
   barra: { marginVertical: spacing.sm },
   regla: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.xs },
   intro: { marginTop: spacing.md },
