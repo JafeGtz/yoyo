@@ -3,20 +3,20 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
-import { SoftCard } from '../../../shared/ui/Card';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisBeneficiosViewModel } from '../viewmodel/useMisBeneficiosViewModel';
 import { CodigoCanjeModal } from './CodigoCanjeModal';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
-const ESTADO: Record<string, { texto: string; color: string }> = {
-  disponible: { texto: 'Disponible', color: colors.mint },
-  canjeado: { texto: 'Canjeado', color: colors.textSecondary },
-  vencido: { texto: 'Vencido', color: colors.danger },
-  pausado: { texto: 'Pausado', color: colors.textSecondary },
-  agotado_cupo: { texto: 'Agotado', color: colors.textSecondary },
+const ESTADO: Record<string, string> = {
+  canjeado: 'Usado', vencido: 'Vencido', pausado: 'Pausado', agotado_cupo: 'Agotado',
 };
+
+function diasRestantes(vence: string | null): number | null {
+  if (!vence) return null;
+  return Math.ceil((new Date(vence).getTime() - Date.now()) / 86400000);
+}
 
 export function MisBeneficiosScreen() {
   const { perfil } = useSession();
@@ -24,92 +24,111 @@ export function MisBeneficiosScreen() {
   const { state } = useMisBeneficiosViewModel(perfil?.cliente_id ?? '');
   const [usando, setUsando] = useState<{ id: string; nombre: string } | null>(null);
 
-  const disponibles =
-    state.status === 'listo' ? state.beneficios.filter(b => b.estado === 'disponible').length : 0;
+  const beneficios = state.status === 'listo' ? state.beneficios : [];
+  const disponibles = beneficios.filter(b => b.estado === 'disponible');
+  const otros = beneficios.filter(b => b.estado !== 'disponible');
 
   return (
     <Screen scroll>
-      <AppText variant="title">Mis beneficios</AppText>
+      <AppText variant="title">Mis premios</AppText>
+
+      {state.status === 'cargando' && <ActivityIndicator color={colors.primary} style={styles.loader} />}
+      {state.status === 'error' && <AppText color={colors.danger}>{state.mensaje}</AppText>}
+
       {state.status === 'listo' && (
-        <AppText variant="body" color={colors.textSecondary} style={styles.sub}>
-          {disponibles} disponible{disponibles === 1 ? '' : 's'} para canjear
-        </AppText>
-      )}
+        <>
+          {/* Banner de premios listos */}
+          <View style={styles.banner}>
+            <AppText variant="hero">🎁</AppText>
+            <View style={styles.flex}>
+              <AppText variant="title" color="#fff">{disponibles.length}</AppText>
+              <AppText variant="caption" color="rgba(255,255,255,0.9)">
+                premio{disponibles.length === 1 ? '' : 's'} listo{disponibles.length === 1 ? '' : 's'} para canjear
+              </AppText>
+            </View>
+          </View>
 
-      <View style={styles.lista}>
-        {state.status === 'cargando' && <ActivityIndicator color={colors.primary} style={styles.loader} />}
-        {state.status === 'error' && <AppText color={colors.danger}>{state.mensaje}</AppText>}
-        {state.status === 'listo' && state.beneficios.length === 0 && (
-          <AppText color={colors.textSecondary}>
-            Aún no tienes beneficios. ¡Escanea para empezar a ganar! 🎁
-          </AppText>
-        )}
+          {beneficios.length === 0 && (
+            <AppText color={colors.textSecondary} style={styles.vacio}>
+              Aún no tienes premios. ¡Visita negocios y desbloquéalos! 🎯
+            </AppText>
+          )}
 
-        {state.status === 'listo' &&
-          state.beneficios.map(b => {
-            const est = ESTADO[b.estado] ?? { texto: b.estado, color: colors.textSecondary };
+          {/* Tickets disponibles */}
+          {disponibles.map(b => {
+            const dias = diasRestantes(b.vence_en);
+            const urgente = dias != null && dias <= 3;
             return (
-              <SoftCard key={b.id} style={styles.item}>
-                <View style={styles.ticket}>
-                  <AppText variant="subtitle" color="#fff">🎟️</AppText>
+              <View key={b.id} style={styles.ticket}>
+                <View style={styles.tira}>
+                  <AppText style={styles.tiraEmoji}>🎟️</AppText>
                 </View>
-                <View style={styles.flex}>
-                  <AppText variant="subtitle">{b.beneficio?.nombre ?? '—'}</AppText>
-                  <AppText variant="caption" color={colors.textSecondary}>
-                    {b.negocio?.nombre ?? ''}
-                    {b.vence_en ? ` · vence ${new Date(b.vence_en).toLocaleDateString('es-MX')}` : ''}
-                  </AppText>
+                <View style={styles.ticketBody}>
+                  <AppText variant="subtitle" numberOfLines={1}>{b.beneficio?.nombre ?? '—'}</AppText>
+                  <AppText variant="caption" color={colors.textSecondary} numberOfLines={1}>{b.negocio?.nombre ?? ''}</AppText>
+                  {dias != null && (
+                    <AppText variant="caption" color={urgente ? colors.danger : colors.textSecondary}>
+                      {dias <= 0 ? 'vence hoy' : `vence en ${dias} día${dias === 1 ? '' : 's'}`}
+                    </AppText>
+                  )}
+                  <Pressable style={styles.canjear} onPress={() => setUsando({ id: b.id, nombre: b.beneficio?.nombre ?? 'Beneficio' })}>
+                    <AppText variant="caption" color="#fff" style={styles.bold}>Canjear ahora</AppText>
+                  </Pressable>
                 </View>
-                {b.estado === 'disponible' ? (
-                  <Pressable
-                    style={styles.usar}
-                    onPress={() => setUsando({ id: b.id, nombre: b.beneficio?.nombre ?? 'Beneficio' })}
-                  >
-                    <AppText variant="caption" color="#fff" style={styles.estadoTexto}>Usar</AppText>
-                  </Pressable>
-                ) : b.estado === 'canjeado' ? (
-                  <Pressable
-                    style={styles.calificar}
-                    onPress={() => navigation.navigate('Resena', { negocioId: b.negocio_id, nombre: b.negocio?.nombre ?? 'el negocio' })}
-                  >
-                    <AppText variant="caption" color={colors.primary} style={styles.estadoTexto}>★ Calificar</AppText>
-                  </Pressable>
-                ) : (
-                  <View style={[styles.estado, { backgroundColor: est.color }]}>
-                    <AppText variant="caption" color="#fff" style={styles.estadoTexto}>{est.texto}</AppText>
-                  </View>
-                )}
-              </SoftCard>
+              </View>
             );
           })}
-      </View>
 
-      <CodigoCanjeModal
-        beneficioId={usando?.id ?? null}
-        nombre={usando?.nombre ?? ''}
-        onClose={() => setUsando(null)}
-      />
+          {/* Historial */}
+          {otros.length > 0 && (
+            <>
+              <AppText variant="subtitle" color={colors.textSecondary} style={styles.histTitulo}>Historial</AppText>
+              {otros.map(b => (
+                <View key={b.id} style={styles.histFila}>
+                  <AppText style={styles.histEmoji}>{b.estado === 'canjeado' ? '✅' : '⌛'}</AppText>
+                  <View style={styles.flex}>
+                    <AppText variant="body" color={colors.textSecondary} numberOfLines={1}>{b.beneficio?.nombre ?? '—'}</AppText>
+                    <AppText variant="caption" color={colors.textSecondary}>{b.negocio?.nombre ?? ''} · {ESTADO[b.estado] ?? b.estado}</AppText>
+                  </View>
+                  {b.estado === 'canjeado' && (
+                    <Pressable onPress={() => navigation.navigate('Resena', { negocioId: b.negocio_id, nombre: b.negocio?.nombre ?? 'el negocio' })}>
+                      <AppText variant="caption" color={colors.primary} style={styles.bold}>★ Calificar</AppText>
+                    </Pressable>
+                  )}
+                </View>
+              ))}
+            </>
+          )}
+        </>
+      )}
+
+      <CodigoCanjeModal beneficioId={usando?.id ?? null} nombre={usando?.nombre ?? ''} onClose={() => setUsando(null)} />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  sub: { marginTop: spacing.xs },
-  lista: { marginTop: spacing.lg },
-  loader: { marginTop: spacing.lg },
-  item: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
-  ticket: {
-    width: 46,
-    height: 46,
-    borderRadius: radii.md,
-    backgroundColor: colors.mint,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
+  loader: { marginTop: spacing.xl },
+  vacio: { marginTop: spacing.xl },
   flex: { flex: 1 },
-  estado: { borderRadius: radii.pill, paddingHorizontal: 10, paddingVertical: 4 },
-  estadoTexto: { fontWeight: '700' },
-  usar: { backgroundColor: colors.primary, borderRadius: radii.pill, paddingHorizontal: 16, paddingVertical: 8 },
-  calificar: { borderWidth: 1.5, borderColor: colors.primary, borderRadius: radii.pill, paddingHorizontal: 14, paddingVertical: 7 },
+  bold: { fontWeight: '700' },
+  banner: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.md, marginBottom: spacing.lg,
+    backgroundColor: colors.mint, borderRadius: radii.xl, padding: spacing.lg,
+  },
+  ticket: {
+    flexDirection: 'row', marginBottom: spacing.md, borderRadius: radii.lg, overflow: 'hidden',
+    backgroundColor: '#fff', borderWidth: 1, borderColor: colors.border,
+    shadowColor: '#1B1B2F', shadowOpacity: 0.08, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 3,
+  },
+  tira: {
+    width: 64, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center',
+    borderStyle: 'dashed', borderRightWidth: 2, borderColor: 'rgba(255,255,255,0.5)',
+  },
+  tiraEmoji: { fontSize: 30 },
+  ticketBody: { flex: 1, padding: spacing.md, gap: 2 },
+  canjear: { alignSelf: 'flex-start', backgroundColor: colors.primary, borderRadius: radii.pill, paddingHorizontal: 18, paddingVertical: 9, marginTop: spacing.sm },
+  histTitulo: { marginTop: spacing.lg, marginBottom: spacing.sm },
+  histFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.sm, opacity: 0.85 },
+  histEmoji: { fontSize: 22 },
 });
