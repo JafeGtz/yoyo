@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import { useNavigation, useIsFocused, type NavigationProp } from '@react-navigation/native';
+import { supabase } from '../../../data/supabase/supabaseClient';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Card } from '../../../shared/ui/Card';
@@ -38,6 +39,17 @@ export function MisNegociosScreen() {
   const medTotal = insig.state.status === 'listo' ? insig.state.total : 0;
   const medDe = insig.state.status === 'listo' ? insig.state.insignias.length : 0;
 
+  // Notificaciones sin leer (se refresca al volver al home).
+  const enfocada = useIsFocused();
+  const [noLeidas, setNoLeidas] = useState(0);
+  useEffect(() => {
+    const cid = perfil?.cliente_id;
+    if (!cid || !enfocada) return;
+    supabase.from('notificacion').select('id', { count: 'exact', head: true })
+      .eq('cliente_id', cid).is('leida_en', null)
+      .then(({ count }) => setNoLeidas(count ?? 0));
+  }, [perfil?.cliente_id, enfocada]);
+
   const verDetalle = (id: string, nombre: string) =>
     navigation.navigate('DetalleNegocio', { negocioId: id, nombre });
 
@@ -45,8 +57,20 @@ export function MisNegociosScreen() {
 
   return (
     <Screen scroll>
-      <AppText variant="caption" color={colors.textSecondary}>Hola,</AppText>
-      <AppText variant="title">{perfil?.nombre ?? 'Cliente'}</AppText>
+      <View style={styles.homeHeader}>
+        <View style={styles.flex}>
+          <AppText variant="caption" color={colors.textSecondary}>Hola,</AppText>
+          <AppText variant="title">{perfil?.nombre ?? 'Cliente'}</AppText>
+        </View>
+        <Pressable style={styles.campana} onPress={() => navigation.navigate('Notificaciones')} hitSlop={8}>
+          <Icon name="bell" size={24} color={colors.primary} />
+          {noLeidas > 0 && (
+            <View style={styles.campanaBadge}>
+              <AppText variant="caption" color="#fff" style={styles.campanaNum}>{noLeidas > 9 ? '9+' : noLeidas}</AppText>
+            </View>
+          )}
+        </Pressable>
+      </View>
 
       {/* Preview del medallero → toca para ver todo */}
       {medallas.length > 0 && (
@@ -146,6 +170,17 @@ export function MisNegociosScreen() {
 const styles = StyleSheet.create({
   loader: { marginTop: spacing.lg },
   bold: { fontWeight: '700' },
+  homeHeader: { flexDirection: 'row', alignItems: 'center' },
+  campana: {
+    width: 46, height: 46, borderRadius: 23, backgroundColor: colors.lavender,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  campanaBadge: {
+    position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9,
+    backgroundColor: colors.pink, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4,
+    borderWidth: 2, borderColor: colors.background,
+  },
+  campanaNum: { fontWeight: '800', fontSize: 10 },
   medallero: { backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.md, marginTop: spacing.lg },
   medFila: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   medTit: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },

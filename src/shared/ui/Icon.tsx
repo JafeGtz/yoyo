@@ -7,7 +7,8 @@ export type IconName =
   | 'ticket' | 'target' | 'dice' | 'calendar' | 'chart' | 'share' | 'chevron' | 'sparkles'
   | 'home' | 'store' | 'user' | 'users' | 'scan' | 'crown' | 'camera' | 'check'
   | 'wheel' | 'bag' | 'coin' | 'lock' | 'flame' | 'compass' | 'sunrise' | 'moon'
-  | 'cake' | 'megaphone' | 'bell' | 'help' | 'heart' | 'hand' | 'clover' | 'alert' | 'hash' | 'arrow';
+  | 'cake' | 'megaphone' | 'bell' | 'help' | 'heart' | 'hand' | 'clover' | 'alert' | 'hash' | 'arrow'
+  | 'trash' | 'check2';
 
 /** Iconos de línea propios (SVG). Estilo consistente: trazo redondeado, currentColor. */
 export function Icon({ name, size = 22, color = colors.textPrimary, strokeWidth = 2 }: {
@@ -74,6 +75,13 @@ export function Icon({ name, size = 22, color = colors.textPrimary, strokeWidth 
       {name === 'clover' && (<><Circle {...p} cx="9" cy="9" r="3.5" /><Circle {...p} cx="15" cy="9" r="3.5" /><Circle {...p} cx="9" cy="15" r="3.5" /><Circle {...p} cx="15" cy="15" r="3.5" /></>)}
       {name === 'alert' && (<><Circle {...p} cx="12" cy="12" r="9" /><Line {...p} x1="12" y1="8" x2="12" y2="13" /><Circle {...f} cx="12" cy="16.5" r="1" /></>)}
       {name === 'hash' && (<><Line {...p} x1="4" y1="9" x2="20" y2="9" /><Line {...p} x1="4" y1="15" x2="20" y2="15" /><Line {...p} x1="9" y1="4" x2="7" y2="20" /><Line {...p} x1="17" y1="4" x2="15" y2="20" /></>)}
+      {name === 'trash' && (<>
+        <Path {...p} d="M4 7h16" />
+        <Path {...p} d="M6.5 7l.9 12a1 1 0 0 0 1 .9h7.2a1 1 0 0 0 1-.9L17.5 7" />
+        <Path {...p} d="M9.5 7V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V7" />
+        <Line {...p} x1="10" y1="11" x2="10" y2="17" /><Line {...p} x1="14" y1="11" x2="14" y2="17" />
+      </>)}
+      {name === 'check2' && <Polyline {...p} points="20 6 9 17 4 12" />}
     </Svg>
   );
 }

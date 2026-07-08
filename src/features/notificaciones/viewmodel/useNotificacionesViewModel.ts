@@ -35,19 +35,38 @@ export function useNotificacionesViewModel(clienteId: string) {
       setState({ status: 'error', mensaje: error.message });
       return;
     }
-    const lista = (data as Notificacion[]) ?? [];
-    setState({ status: 'listo', notificaciones: lista });
-
-    // Marcar como leídas las no leídas.
-    const sinLeer = lista.filter(n => !n.leida_en).map(n => n.id);
-    if (sinLeer.length > 0) {
-      supabase.from('notificacion').update({ leida_en: new Date().toISOString() }).in('id', sinLeer);
-    }
+    // Ya NO se marcan todas como leídas al abrir: el usuario distingue leídas/no leídas.
+    setState({ status: 'listo', notificaciones: (data as Notificacion[]) ?? [] });
   }, [clienteId]);
 
-  useEffect(() => {
-    cargar();
-  }, [cargar]);
+  useEffect(() => { cargar(); }, [cargar]);
 
-  return { state };
+  // Marca una como leída (optimista + persiste).
+  const marcarLeida = useCallback(async (id: string) => {
+    const ahora = new Date().toISOString();
+    setState(s => s.status === 'listo'
+      ? { ...s, notificaciones: s.notificaciones.map(n => n.id === id && !n.leida_en ? { ...n, leida_en: ahora } : n) }
+      : s);
+    await supabase.from('notificacion').update({ leida_en: ahora }).eq('id', id).is('leida_en', null);
+  }, []);
+
+  // Marca todas como leídas.
+  const marcarTodas = useCallback(async () => {
+    if (!clienteId) return;
+    const ahora = new Date().toISOString();
+    setState(s => s.status === 'listo'
+      ? { ...s, notificaciones: s.notificaciones.map(n => n.leida_en ? n : { ...n, leida_en: ahora }) }
+      : s);
+    await supabase.from('notificacion').update({ leida_en: ahora }).eq('cliente_id', clienteId).is('leida_en', null);
+  }, [clienteId]);
+
+  // Elimina una notificación.
+  const eliminar = useCallback(async (id: string) => {
+    setState(s => s.status === 'listo'
+      ? { ...s, notificaciones: s.notificaciones.filter(n => n.id !== id) }
+      : s);
+    await supabase.from('notificacion').delete().eq('id', id);
+  }, []);
+
+  return { state, marcarLeida, marcarTodas, eliminar, recargar: cargar };
 }
