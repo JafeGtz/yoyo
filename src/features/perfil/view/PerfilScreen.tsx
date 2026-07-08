@@ -6,6 +6,7 @@ import { AppText } from '../../../shared/ui/AppText';
 import { SoftCard } from '../../../shared/ui/Card';
 import { HeroCard } from '../../../shared/ui/HeroCard';
 import { AppButton } from '../../../shared/ui/AppButton';
+import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { colors, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { cerrarSesion } from '../../../core/auth/authService';
@@ -26,11 +27,11 @@ export function PerfilScreen() {
       .then(({ count }) => setInsignias(count ?? 0));
   }, [perfil?.cliente_id]);
 
-  const accesos: { icono: string; label: string; valor?: string; destino?: keyof ConsumidorStackParams }[] = [
-    { icono: '🏅', label: 'Insignias', valor: String(insignias), destino: 'Insignias' },
-    { icono: '🏪', label: 'Mis negocios' },
-    { icono: '🔔', label: 'Notificaciones', destino: 'Notificaciones' },
-    { icono: '👥', label: 'Referidos', destino: 'Referidos' },
+  const accesos: { icono: IconName; label: string; valor?: string; destino?: keyof ConsumidorStackParams }[] = [
+    { icono: 'medal', label: 'Insignias', valor: String(insignias), destino: 'Insignias' },
+    { icono: 'store', label: 'Mis negocios' },
+    { icono: 'bell', label: 'Notificaciones', destino: 'Notificaciones' },
+    { icono: 'users', label: 'Referidos', destino: 'Referidos' },
   ];
 
   return (
@@ -59,9 +60,7 @@ export function PerfilScreen() {
             onPress={() => a.destino && navigation.navigate(a.destino as never)}
           >
             <SoftCard style={styles.gridItem}>
-              <View style={styles.iconoCirculo}>
-                <AppText variant="subtitle">{a.icono}</AppText>
-              </View>
+              <View style={styles.iconoCirculo}><Icon name={a.icono} size={22} color={colors.primary} /></View>
               <AppText variant="caption" style={styles.gridLabel}>{a.label}</AppText>
               {a.valor && <AppText variant="subtitle" color={colors.primary}>{a.valor}</AppText>}
             </SoftCard>
@@ -71,16 +70,16 @@ export function PerfilScreen() {
 
       <AppText variant="subtitle" style={styles.seccion}>Cuenta</AppText>
       <SoftCard style={styles.grupo}>
-        <Fila icono="👤" label="Datos personales" onPress={() => navigation.navigate('EditarPerfil')} />
+        <Fila icono="user" label="Datos personales" onPress={() => navigation.navigate('EditarPerfil')} />
         <Divisor />
-        <Fila icono="🔒" label="Privacidad" />
+        <Fila icono="lock" label="Privacidad" />
       </SoftCard>
 
       <AppText variant="subtitle" style={styles.seccion}>Soporte</AppText>
       <SoftCard style={styles.grupo}>
-        <Fila icono="❓" label="Centro de ayuda" />
+        <Fila icono="help" label="Centro de ayuda" />
         <Divisor />
-        <Fila icono="💬" label="Contáctanos" />
+        <Fila icono="chat" label="Contáctanos" />
       </SoftCard>
 
       <View style={styles.logout}>
@@ -90,10 +89,10 @@ export function PerfilScreen() {
   );
 }
 
-function Fila({ icono, label, onPress }: { icono: string; label: string; onPress?: () => void }) {
+function Fila({ icono, label, onPress }: { icono: IconName; label: string; onPress?: () => void }) {
   return (
     <Pressable style={styles.fila} onPress={onPress} disabled={!onPress}>
-      <AppText variant="body" style={styles.filaIcono}>{icono}</AppText>
+      <Icon name={icono} size={20} color={colors.textSecondary} />
       <AppText variant="body" style={styles.flex}>{label}</AppText>
       <AppText variant="body" color={colors.textSecondary}>›</AppText>
     </Pressable>

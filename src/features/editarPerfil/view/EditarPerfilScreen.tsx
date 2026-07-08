@@ -40,7 +40,7 @@ export function EditarPerfilScreen() {
     setGuardando(false);
     if (error) setMsg(error.message);
     else {
-      setMsg('Datos guardados ✓');
+      setMsg('Datos guardados');
       recargarPerfil();
     }
   }
@@ -78,7 +78,7 @@ export function EditarPerfilScreen() {
         <AppInput label="Cumpleaños (AAAA-MM-DD)" value={cumpleanos} onChangeText={setCumpleanos} placeholder="1990-05-10" />
       </View>
 
-      {msg ? <AppText color={msg.includes('✓') ? colors.mint : colors.danger} style={styles.msg}>{msg}</AppText> : null}
+      {msg ? <AppText color={msg === 'Datos guardados' ? colors.mint : colors.danger} style={styles.msg}>{msg}</AppText> : null}
 
       <AppButton titulo="Guardar" onPress={guardar} cargando={guardando} />
 

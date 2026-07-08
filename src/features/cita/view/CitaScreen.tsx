@@ -4,6 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { agendarCita, slotsDisponibles, solicitarCita } from '../../../data/services/citaService';
@@ -95,7 +96,7 @@ export function CitaScreen() {
     return (
       <Screen>
         <View style={styles.centro}>
-          <AppText variant="hero">✅</AppText>
+          <Icon name="check" size={52} color={colors.mint} />
           <AppText variant="title" style={styles.exitoTit}>
             {esAgenda ? 'Cita confirmada' : 'Solicitud enviada'}
           </AppText>

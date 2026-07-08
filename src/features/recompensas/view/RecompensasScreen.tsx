@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { supabase } from '../../../data/supabase/supabaseClient';
@@ -80,8 +81,8 @@ export function RecompensasScreen() {
       <AppText variant="title">Tu camino de recompensas</AppText>
       <AppText variant="body" color={colors.textSecondary} style={styles.sub}>{params.nombre}</AppText>
       <View style={styles.resumen}>
-        <View style={styles.pill}><AppText variant="caption" color={colors.primary}>🔵 {vis} visitas</AppText></View>
-        <View style={styles.pill}><AppText variant="caption" color={colors.primary}>💰 ${mon.toLocaleString('es-MX')}</AppText></View>
+        <View style={styles.pill}><Icon name="target" size={14} color={colors.primary} /><AppText variant="caption" color={colors.primary}>{vis} visitas</AppText></View>
+        <View style={styles.pill}><Icon name="coin" size={14} color={colors.primary} /><AppText variant="caption" color={colors.primary}>${mon.toLocaleString('es-MX')}</AppText></View>
       </View>
 
       {lista === null ? (
@@ -95,7 +96,7 @@ export function RecompensasScreen() {
               {/* Riel: punto + línea */}
               <View style={styles.riel}>
                 <View style={[styles.dot, r.desbloqueado ? styles.dotOn : styles.dotOff]}>
-                  <AppText variant="caption" color="#fff">{r.desbloqueado ? '✓' : '🔒'}</AppText>
+                  <Icon name={r.desbloqueado ? 'check' : 'lock'} size={18} color="#fff" />
                 </View>
                 {i < lista.length - 1 && <View style={styles.linea} />}
               </View>
@@ -105,7 +106,7 @@ export function RecompensasScreen() {
                 <View style={styles.reqRow}>
                   <View style={styles.reqPill}><AppText variant="caption" color={colors.textSecondary}>{r.requisito}</AppText></View>
                   {r.desbloqueado
-                    ? <AppText variant="caption" color={colors.mint} style={styles.bold}>¡Desbloqueado! 🎉</AppText>
+                    ? <AppText variant="caption" color={colors.mint} style={styles.bold}>¡Desbloqueado!</AppText>
                     : <AppText variant="caption" color={colors.textSecondary}>{r.falta}</AppText>}
                 </View>
               </View>
@@ -121,7 +122,7 @@ const DOT = 34;
 const styles = StyleSheet.create({
   sub: { marginTop: spacing.xs },
   resumen: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
-  pill: { backgroundColor: colors.lavender, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radii.pill },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.lavender, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radii.pill },
   loader: { marginTop: spacing.xl, alignSelf: 'center' },
   timeline: { marginTop: spacing.lg },
   fila: { flexDirection: 'row' },

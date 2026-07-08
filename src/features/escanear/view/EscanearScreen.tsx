@@ -5,6 +5,7 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { QrScanner } from '../../../shared/ui/QrScanner';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import {
   registrarVisita, ApiError, catalogoDelNegocio, marcarProductoVisita,
@@ -78,14 +79,14 @@ export function EscanearScreen() {
     return (
       <Screen>
         <View style={styles.centroClaro}>
-          <AppText variant="hero">🎉</AppText>
+          <Icon name="trophy" size={52} color={colors.mint} />
           <AppText variant="title" style={styles.exitoTitulo}>¡Visita registrada!</AppText>
           <AppText variant="subtitle" color={colors.primary}>Visita #{resultado.visita_numero}</AppText>
           {resultado.beneficios_desbloqueados.length > 0 && (
             <View style={styles.beneficios}>
               <AppText variant="caption" color={colors.textSecondary}>Desbloqueaste:</AppText>
               {resultado.beneficios_desbloqueados.map(b => (
-                <AppText key={b.id} variant="subtitle" color={colors.mint} style={styles.beneficio}>🎁 {b.nombre}</AppText>
+                <AppText key={b.id} variant="subtitle" color={colors.mint} style={styles.beneficio}>{b.nombre}</AppText>
               ))}
             </View>
           )}
@@ -93,7 +94,7 @@ export function EscanearScreen() {
           {/* Etiquetar producto (opcional) — avanza retos de producto */}
           {productos.length > 0 && (
             productoElegido ? (
-              <AppText variant="caption" color={colors.mint} style={styles.overlayTexto}>✓ Anotamos: {productoElegido}</AppText>
+              <AppText variant="caption" color={colors.mint} style={styles.overlayTexto}>Anotamos: {productoElegido}</AppText>
             ) : (
               <View style={styles.etiquetar}>
                 <AppText variant="caption" color={colors.textSecondary}>¿Qué te llevaste? (opcional)</AppText>
@@ -154,7 +155,7 @@ export function EscanearScreen() {
       )}
       {estado === 'error' && (
         <View style={styles.overlay}>
-          <AppText variant="hero">😕</AppText>
+          <Icon name="alert" size={52} color="#fff" />
           <AppText color="#fff" style={styles.overlayTexto}>{error}</AppText>
           <AppButton titulo="Reintentar" onPress={reiniciar} style={styles.botonOscuro} />
         </View>

@@ -18,7 +18,7 @@ export function ReferidosScreen() {
 
   async function compartir(codigo: string) {
     await Share.share({
-      message: `¡Únete a yoyo y ganemos premios juntos! Usa mi código: ${codigo} 🎁`,
+      message: `¡Únete a yoyo y ganemos premios juntos! Usa mi código: `,
     });
   }
 
@@ -47,7 +47,7 @@ export function ReferidosScreen() {
             </View>
           </HeroCard>
 
-          <AppButton titulo="📤 Compartir código" onPress={() => compartir(state.datos.codigo)} style={styles.boton} />
+          <AppButton icono="share" titulo="Compartir código" onPress={() => compartir(state.datos.codigo)} style={styles.boton} />
 
           {state.datos.referidos.length > 0 && (
             <>
@@ -62,7 +62,7 @@ export function ReferidosScreen() {
                   </View>
                   <View style={[styles.estado, r.estado === 'completado' ? styles.completado : styles.pendiente]}>
                     <AppText variant="caption" color={r.estado === 'completado' ? '#fff' : colors.textSecondary} style={styles.bold}>
-                      {r.estado === 'completado' ? '✓ Unido' : 'Pendiente'}
+                      {r.estado === 'completado' ? 'Unido' : 'Pendiente'}
                     </AppText>
                   </View>
                 </SoftCard>

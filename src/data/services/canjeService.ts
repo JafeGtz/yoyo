@@ -20,7 +20,7 @@ export interface ResultadoCanje {
 const MENSAJES: Record<string, string> = {
   qr_invalido: 'El código QR no es válido.',
   qr_caducado_o_inactivo: 'Este QR expiró. Pide al negocio que lo regenere.',
-  visita_duplicada_24h: 'Ya registraste una visita aquí hoy. Vuelve mañana 🙂',
+  visita_duplicada_24h: 'Ya registraste una visita aquí hoy. Vuelve mañana',
   fuera_del_area: 'Estás fuera del área del negocio.',
   falta_ubicacion: 'Activa la ubicación para registrar la visita.',
   falta_codigo_visita: 'Este negocio pide un código. Pídeselo al personal.',

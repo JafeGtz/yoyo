@@ -26,7 +26,7 @@ export function RegistroScreen({ irALogin }: { irALogin: () => void }) {
   return (
     <Screen bg={colors.lavenderBg} scroll>
       <View style={styles.header}>
-        <AppText variant="hero">Crea tu{'\n'}cuenta 🎁</AppText>
+        <AppText variant="hero">Crea tu{'\n'}cuenta</AppText>
         <AppText variant="body" color={colors.textSecondary} style={styles.sub}>
           Empieza a ganar recompensas
         </AppText>

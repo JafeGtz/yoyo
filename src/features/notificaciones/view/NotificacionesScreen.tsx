@@ -4,14 +4,15 @@ import { useNavigation } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { SoftCard } from '../../../shared/ui/Card';
+import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useNotificacionesViewModel, type Notificacion } from '../viewmodel/useNotificacionesViewModel';
 
-const ICONO: Record<string, string> = {
-  campana: '📣', vencimiento: '⏰', inactividad: '👋', cumpleanos: '🎂', referido: '🤝',
+const ICONO: Record<string, IconName> = {
+  campana: 'megaphone', vencimiento: 'bell', inactividad: 'user', cumpleanos: 'cake', referido: 'users', premio: 'gift',
 };
-const emoji = (tipo: string) => ICONO[tipo] ?? '🔔';
+const iconOf = (tipo: string): IconName => ICONO[tipo] ?? 'bell';
 
 // Agrupa por Hoy / Ayer / Anteriores.
 function grupo(fecha: string): string {
@@ -60,9 +61,7 @@ export function NotificacionesScreen() {
           <AppText variant="subtitle" style={styles.grupo}>{g.titulo}</AppText>
           {g.items.map(n => (
             <SoftCard key={n.id} style={styles.item}>
-              <View style={styles.icono}>
-                <AppText variant="subtitle">{emoji(n.tipo)}</AppText>
-              </View>
+              <View style={styles.icono}><Icon name={iconOf(n.tipo)} size={22} color={colors.primary} /></View>
               <View style={styles.flex}>
                 <AppText variant="subtitle">{n.titulo}</AppText>
                 {n.cuerpo && <AppText variant="caption" color={colors.textSecondary}>{n.cuerpo}</AppText>}

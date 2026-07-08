@@ -83,7 +83,7 @@ export function RetosScreen() {
               <View style={styles.fila}>
                 <AppText variant="subtitle" style={styles.flex}>{r.nombre}</AppText>
                 {completado && (
-                  <AppText variant="caption" color={colors.mint} style={styles.badge}>✓ Completado</AppText>
+                  <AppText variant="caption" color={colors.mint} style={styles.badge}>Completado</AppText>
                 )}
               </View>
               {r.descripcion ? <AppText variant="caption" color={colors.textSecondary}>{r.descripcion}</AppText> : null}
@@ -94,7 +94,7 @@ export function RetosScreen() {
                 </AppText>
               </View>
               {r.premio ? (
-                <AppText variant="caption" color={colors.primary}>🎁 Premio: {r.premio}</AppText>
+                <AppText variant="caption" color={colors.primary}>Premio: {r.premio}</AppText>
               ) : null}
             </Card>
           );

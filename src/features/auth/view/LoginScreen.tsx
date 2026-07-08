@@ -15,7 +15,7 @@ export function LoginScreen({ irARegistro }: { irARegistro: () => void }) {
   return (
     <Screen bg={colors.lavenderBg} scroll>
       <View style={styles.header}>
-        <AppText variant="hero">Bienvenido{'\n'}de vuelta 👋</AppText>
+        <AppText variant="hero">Bienvenido{'\n'}de vuelta</AppText>
         <AppText variant="body" color={colors.textSecondary} style={styles.sub}>
           Tu lealtad, recompensada
         </AppText>

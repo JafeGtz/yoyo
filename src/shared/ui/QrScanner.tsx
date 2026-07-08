@@ -7,6 +7,7 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import { AppText } from './AppText';
+import { Icon } from './Icon';
 import { AppButton } from './AppButton';
 import { colors, radii, spacing } from '../theme';
 
@@ -47,7 +48,7 @@ export function QrScanner({ onScan, activo, instruccion, colorMarco = colors.pri
   if (!hasPermission) {
     return (
       <View style={styles.aviso}>
-        <AppText variant="hero">📷</AppText>
+        <Icon name="camera" size={48} color="#fff" />
         <AppText color="#fff" style={styles.avisoTexto}>
           Necesitamos acceso a tu cámara para escanear.
         </AppText>

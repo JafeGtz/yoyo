@@ -93,7 +93,7 @@ export function MisBeneficiosScreen() {
                   </View>
                   {b.estado === 'canjeado' && (
                     <Pressable onPress={() => navigation.navigate('Resena', { negocioId: b.negocio_id, nombre: b.negocio?.nombre ?? 'el negocio' })}>
-                      <AppText variant="caption" color={colors.primary} style={styles.bold}>★ Calificar</AppText>
+                      <AppText variant="caption" color={colors.primary} style={styles.bold}>Calificar</AppText>
                     </Pressable>
                   )}
                 </View>

@@ -4,6 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
+import { Icon } from '../../../shared/ui/Icon';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { supabase } from '../../../data/supabase/supabaseClient';
@@ -54,7 +55,7 @@ export function ResenaScreen() {
       <View style={styles.estrellas}>
         {[1, 2, 3, 4, 5].map(n => (
           <Pressable key={n} onPress={() => setEstrellas(n)} hitSlop={6}>
-            <AppText style={styles.estrella} color={n <= estrellas ? colors.star : colors.border}>★</AppText>
+            <Icon name="star" size={40} color={n <= estrellas ? colors.star : colors.border} />
           </Pressable>
         ))}
       </View>

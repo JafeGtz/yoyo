@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
+import { Icon } from '../../../shared/ui/Icon';
 import { QrScanner } from '../../../shared/ui/QrScanner';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { cerrarSesion } from '../../../core/auth/authService';
@@ -58,7 +59,7 @@ export function EmpleadoScreen() {
     return (
       <Screen>
         <View style={styles.centroClaro}>
-          <AppText variant="hero">✅</AppText>
+          <Icon name="check" size={52} color={colors.mint} />
           <AppText variant="title" style={styles.exitoTitulo}>Canje confirmado</AppText>
           <View style={styles.detalle}>
             <AppText variant="subtitle">{resultado.beneficio}</AppText>
@@ -83,7 +84,7 @@ export function EmpleadoScreen() {
       )}
       {estado === 'error' && (
         <View style={styles.overlay}>
-          <AppText variant="hero">😕</AppText>
+          <Icon name="alert" size={52} color="#fff" />
           <AppText color="#fff" style={styles.overlayTexto}>{error}</AppText>
           <AppButton titulo="Reintentar" onPress={reiniciar} style={styles.botonOscuro} />
         </View>
@@ -100,7 +101,7 @@ export function EmpleadoScreen() {
       {/* Botón flotante: generar código de visita */}
       {estado === 'escaneando' && (
         <View style={styles.fab} pointerEvents="box-none">
-          <AppButton titulo={generando ? 'Generando…' : '🔢 Código de visita'} onPress={generarCodigo} cargando={generando} />
+          <AppButton titulo={generando ? 'Generando…' : 'Código de visita'} icono={generando ? undefined : 'hash'} onPress={generarCodigo} cargando={generando} />
         </View>
       )}
 

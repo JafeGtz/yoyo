@@ -72,13 +72,13 @@ export function RifasScreen() {
               <View style={styles.fila}>
                 <AppText variant="subtitle" style={styles.flex}>{r.nombre}</AppText>
                 {r.estado === 'sorteada'
-                  ? <Etiqueta texto={r.gano ? '🎉 ¡Ganaste!' : 'Ya se sorteó'} color={r.gano ? colors.mint : colors.textSecondary} />
+                  ? <Etiqueta texto={r.gano ? '¡Ganaste!' : 'Ya se sorteó'} color={r.gano ? colors.mint : colors.textSecondary} />
                   : <Etiqueta texto="Abierta" color={colors.primary} />}
               </View>
-              {r.premio ? <AppText variant="caption" color={colors.primary}>🎁 {r.premio}</AppText> : null}
+              {r.premio ? <AppText variant="caption" color={colors.primary}>{r.premio}</AppText> : null}
               {r.estado !== 'sorteada' && (
                 <AppText variant="caption" color={participa ? colors.mint : colors.textSecondary} style={styles.estado}>
-                  {participa ? '✓ Estás participando' : `Te faltan ${faltan} visita${faltan === 1 ? '' : 's'} para participar`}
+                  {participa ? 'Estás participando' : `Te faltan ${faltan} visita${faltan === 1 ? '' : 's'} para participar`}
                 </AppText>
               )}
             </Card>
