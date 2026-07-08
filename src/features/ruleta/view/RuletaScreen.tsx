@@ -5,6 +5,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
+import { Confetti } from '../../../shared/ui/Confetti';
 import { colors, spacing } from '../../../shared/theme';
 import { supabase } from '../../../data/supabase/supabaseClient';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
@@ -96,6 +97,7 @@ export function RuletaScreen() {
 
   return (
     <Screen scroll>
+      {estado === 'resultado' && <Confetti />}
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
         <AppText variant="title" color={colors.primary}>‹</AppText>
       </Pressable>
