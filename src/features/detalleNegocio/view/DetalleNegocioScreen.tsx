@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -8,6 +8,7 @@ import { HeroCard } from '../../../shared/ui/HeroCard';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { WalletStack } from '../../../shared/ui/WalletStack';
+import { CatalogoGrid } from '../../catalogo/view/CatalogoGrid';
 import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { acentos, colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -182,23 +183,16 @@ export function DetalleNegocioScreen() {
         </>
       )}
 
-      {/* Catálogo en cuadrícula con fotos */}
+      {/* Catálogo (solo 4 + ver todo -> pantalla completa) */}
       {d.catalogo.length > 0 && (
         <>
-          <SectionHeader titulo="Catálogo" />
-          <View style={styles.grid}>
-            {d.catalogo.map(it => (
-              <View key={it.id} style={styles.gridItem}>
-                <View style={styles.gridFoto}>
-                  {it.foto_url
-                    ? <Image source={{ uri: it.foto_url }} style={styles.fotoImg} resizeMode="cover" />
-                    : <Icon name="bag" size={34} color={colors.textSecondary} />}
-                </View>
-                <AppText variant="caption" numberOfLines={1} style={styles.gridNombre}>{it.nombre}</AppText>
-                {it.precio != null && <AppText variant="subtitle" color={colors.primary}>${it.precio}</AppText>}
-              </View>
-            ))}
-          </View>
+          <SectionHeader
+            titulo="Catálogo"
+            onVerTodo={d.catalogo.length > 4
+              ? () => navigation.navigate('Catalogo', { negocioId: d.negocio.id, nombre: d.negocio.nombre })
+              : undefined}
+          />
+          <CatalogoGrid items={d.catalogo.slice(0, 4)} />
         </>
       )}
 
