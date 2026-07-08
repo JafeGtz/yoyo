@@ -5,7 +5,7 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { AppInput } from '../../../shared/ui/AppInput';
 import { SoftCard } from '../../../shared/ui/Card';
-import { colors, radii, spacing } from '../../../shared/theme';
+import { acentos, colors, radii, spacing } from '../../../shared/theme';
 import { useDescubrirViewModel } from '../viewmodel/useDescubrirViewModel';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
@@ -50,22 +50,28 @@ export function DescubrirScreen() {
         <AppText color={colors.textSecondary} style={styles.vacio}>Sin resultados.</AppText>
       )}
 
-      {filtrados.map(n => (
-        <Pressable key={n.id} onPress={() => navigation.navigate('DetalleNegocio', { negocioId: n.id, nombre: n.nombre })}>
-          <SoftCard style={styles.item}>
-            <View style={styles.logo}>
-              <AppText variant="subtitle" color="#fff">{n.nombre.charAt(0).toUpperCase()}</AppText>
-            </View>
-            <View style={styles.flex}>
-              <AppText variant="subtitle">{n.nombre}</AppText>
-              <AppText variant="caption" color={colors.textSecondary}>
-                {n.tipo}{n.direccion ? ` · ${n.direccion}` : ''}
-              </AppText>
-            </View>
-            <AppText variant="subtitle" color={colors.textSecondary}>›</AppText>
-          </SoftCard>
-        </Pressable>
-      ))}
+      {filtrados.map((n, i) => {
+        const ac = acentos[i % acentos.length];
+        return (
+          <Pressable key={n.id} onPress={() => navigation.navigate('DetalleNegocio', { negocioId: n.id, nombre: n.nombre })}>
+            <SoftCard style={[styles.item, { borderLeftWidth: 4, borderLeftColor: ac.fuerte }]}>
+              <View style={[styles.logo, { backgroundColor: ac.fuerte }]}>
+                <AppText variant="subtitle" color="#fff">{n.nombre.charAt(0).toUpperCase()}</AppText>
+              </View>
+              <View style={styles.flex}>
+                <AppText variant="subtitle">{n.nombre}</AppText>
+                <View style={styles.metaFila}>
+                  <View style={[styles.tag, { backgroundColor: ac.suave }]}>
+                    <AppText variant="caption" color={ac.fuerte} style={styles.bold}>{n.tipo}</AppText>
+                  </View>
+                  {n.direccion ? <AppText variant="caption" color={colors.textSecondary} numberOfLines={1} style={styles.flex}>{n.direccion}</AppText> : null}
+                </View>
+              </View>
+              <AppText variant="subtitle" color={ac.fuerte}>›</AppText>
+            </SoftCard>
+          </Pressable>
+        );
+      })}
     </Screen>
   );
 }
@@ -94,4 +100,6 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
   },
   flex: { flex: 1 },
+  metaFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 4 },
+  tag: { borderRadius: radii.pill, paddingHorizontal: spacing.sm, paddingVertical: 2 },
 });

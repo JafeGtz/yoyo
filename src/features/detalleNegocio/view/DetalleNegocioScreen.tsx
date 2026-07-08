@@ -5,11 +5,10 @@ import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Card, SoftCard } from '../../../shared/ui/Card';
 import { HeroCard } from '../../../shared/ui/HeroCard';
-import { AppButton } from '../../../shared/ui/AppButton';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
-import { Icon } from '../../../shared/ui/Icon';
-import { colors, radii, spacing } from '../../../shared/theme';
+import { Icon, type IconName } from '../../../shared/ui/Icon';
+import { acentos, colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { CodigoCanjeModal } from '../../misBeneficios/view/CodigoCanjeModal';
 import { useDetalleNegocioViewModel } from '../viewmodel/useDetalleNegocioViewModel';
@@ -35,6 +34,7 @@ export function DetalleNegocioScreen() {
 
   const d = state.data;
   const inicial = d.negocio.nombre.charAt(0).toUpperCase();
+  const acLogo = acentos[[...d.negocio.nombre].reduce((s, c) => s + c.charCodeAt(0), 0) % acentos.length];
 
   return (
     <Screen scroll>
@@ -42,7 +42,7 @@ export function DetalleNegocioScreen() {
 
       {/* Encabezado: logo/inicial + nombre + tipo */}
       <View style={styles.encabezado}>
-        <View style={styles.logo}>
+        <View style={[styles.logo, { backgroundColor: acLogo.fuerte }]}>
           <AppText variant="title" color="#fff">{inicial}</AppText>
         </View>
         <View style={styles.flex}>
@@ -118,72 +118,29 @@ export function DetalleNegocioScreen() {
         </Pressable>
       </HeroCard>
 
-      {/* Compartir carné de fan */}
-      <AppButton
-        icono="camera"
-        titulo="Compartir mi carné de fan"
-        variante="secundario"
-        style={styles.ruletaBtn}
-        onPress={() => navigation.navigate('CarneFan', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
-      />
-
-      {/* Gira y Gana */}
-      {d.tieneRuleta && (
-        <AppButton
-          icono="wheel"
-          titulo="Gira y Gana"
-          variante="secundario"
-          style={styles.ruletaBtn}
-          onPress={() => navigation.navigate('Ruleta', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
-        />
-      )}
-
-      {/* Rasca y Gana */}
-      {d.tieneRasca && (
-        <AppButton
-          icono="coin"
-          titulo="Rasca y Gana"
-          variante="secundario"
-          style={styles.ruletaBtn}
-          onPress={() => navigation.navigate('Rasca', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
-        />
-      )}
-
-      {/* Retos */}
-      {d.tieneRetos && (
-        <AppButton
-          icono="target"
-          titulo="Retos"
-          variante="secundario"
-          style={styles.ruletaBtn}
-          onPress={() => navigation.navigate('Retos', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
-        />
-      )}
-
-      {/* Rifas */}
-      {d.tieneRifas && (
-        <AppButton
-          icono="gift"
-          titulo="Rifas"
-          variante="secundario"
-          style={styles.ruletaBtn}
-          onPress={() => navigation.navigate('Rifas', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
-        />
-      )}
-
-      {/* Agendar cita */}
-      {d.negocio.citas_modo !== 'desactivado' && (
-        <AppButton
-          icono="calendar"
-          titulo="Agendar cita"
-          style={styles.ruletaBtn}
-          onPress={() => navigation.navigate('Cita', {
-            negocioId: d.negocio.id,
-            nombre: d.negocio.nombre,
-            modo: d.negocio.citas_modo as 'solicitud' | 'agenda',
+      {/* Acciones (carné, juegos, cita) como mosaicos colorados */}
+      <View style={styles.accionesGrid}>
+        {([
+          { on: true, icono: 'star', label: 'Mi carné VIP', go: () => navigation.navigate('CarneFan', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
+          { on: d.tieneRuleta, icono: 'wheel', label: 'Gira y Gana', go: () => navigation.navigate('Ruleta', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
+          { on: d.tieneRasca, icono: 'coin', label: 'Rasca y Gana', go: () => navigation.navigate('Rasca', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
+          { on: d.tieneRetos, icono: 'target', label: 'Retos', go: () => navigation.navigate('Retos', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
+          { on: d.tieneRifas, icono: 'gift', label: 'Rifas', go: () => navigation.navigate('Rifas', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
+          { on: d.negocio.citas_modo !== 'desactivado', icono: 'calendar', label: 'Agendar cita', go: () => navigation.navigate('Cita', { negocioId: d.negocio.id, nombre: d.negocio.nombre, modo: d.negocio.citas_modo as 'solicitud' | 'agenda' }) },
+        ] as { on: boolean; icono: IconName; label: string; go: () => void }[])
+          .filter(a => a.on)
+          .map((a, idx) => {
+            const c = acentos[idx % acentos.length];
+            return (
+              <Pressable key={a.label} style={[styles.tile, { backgroundColor: c.suave }]} onPress={a.go}>
+                <View style={[styles.tileIcon, { backgroundColor: c.fuerte }]}>
+                  <Icon name={a.icono} size={24} color="#fff" />
+                </View>
+                <AppText variant="subtitle" color={c.fuerte}>{a.label}</AppText>
+              </Pressable>
+            );
           })}
-        />
-      )}
+      </View>
 
       {/* Beneficios disponibles */}
       {d.beneficios.length > 0 && (
@@ -319,6 +276,9 @@ const styles = StyleSheet.create({
   faltan: { marginTop: spacing.md, fontWeight: '700' },
   verTodas: { marginTop: spacing.sm, fontWeight: '700', textDecorationLine: 'underline' },
   item: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
+  accionesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: spacing.md },
+  tile: { width: '48%', borderRadius: radii.lg, padding: spacing.md, marginBottom: spacing.md, gap: spacing.sm, alignItems: 'flex-start' },
+  tileIcon: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   gridItem: {
     width: '47%', backgroundColor: colors.surface, borderRadius: radii.lg,

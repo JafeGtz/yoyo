@@ -24,6 +24,16 @@ export const colors = {
   success: '#34D6A8',
 } as const;
 
+// Paleta de acentos que combinan con el morado (menta, rosa, dorado, turquesa, coral).
+export const acentos = [
+  { fuerte: '#4F3CE0', suave: '#ECE9FC' },
+  { fuerte: '#34D6A8', suave: '#DAF6EE' },
+  { fuerte: '#FB3D93', suave: '#FEE1EE' },
+  { fuerte: '#F5B731', suave: '#FDF0D3' },
+  { fuerte: '#00BCD4', suave: '#D6F4F8' },
+  { fuerte: '#FF7A59', suave: '#FFE5DD' },
+] as const;
+
 export const spacing = {
   xs: 4,
   sm: 8,
