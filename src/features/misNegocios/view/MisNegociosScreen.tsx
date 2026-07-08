@@ -7,6 +7,7 @@ import { Card } from '../../../shared/ui/Card';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { Icon } from '../../../shared/ui/Icon';
+import { NivelBadge } from '../../../shared/ui/NivelBadge';
 import { iconoDeLogro } from '../../../shared/ui/insigniaIcono';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -85,9 +86,8 @@ export function MisNegociosScreen() {
                     </View>
                     <View style={styles.flex}>
                       <AppText variant="subtitle">{n.negocio.nombre}</AppText>
-                      <AppText variant="caption" color={colors.textSecondary}>
-                        {n.negocio.tipo} · Nivel {n.nivelActual}
-                      </AppText>
+                      <AppText variant="caption" color={colors.textSecondary} style={styles.tipo}>{n.negocio.tipo}</AppText>
+                      <NivelBadge nivel={n.nivelActual} fuerte={ac.fuerte} suave={ac.suave} />
                     </View>
                     <View style={[styles.visitasPill, { backgroundColor: ac.suave }]}>
                       <AppText variant="subtitle" color={ac.fuerte}>{n.visitasTotales}</AppText>
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
   negocio: { marginBottom: spacing.md },
   negocioFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   avatar: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  tipo: { marginBottom: 6 },
   flex: { flex: 1 },
   visitasPill: { alignItems: 'center', borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
   barra: { marginVertical: spacing.sm },

@@ -8,6 +8,7 @@ import { HeroCard } from '../../../shared/ui/HeroCard';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { WalletStack } from '../../../shared/ui/WalletStack';
+import { NivelBadge } from '../../../shared/ui/NivelBadge';
 import { CatalogoGrid } from '../../catalogo/view/CatalogoGrid';
 import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { acentos, colors, radii, spacing } from '../../../shared/theme';
@@ -98,8 +99,9 @@ export function DetalleNegocioScreen() {
         <View style={styles.heroFila}>
           <View>
             <AppText variant="hero" color="#fff" style={styles.visitas}>{d.visitasTotales}</AppText>
-            <AppText variant="caption" color="rgba(255,255,255,0.8)">visitas · Nivel {d.nivel}</AppText>
+            <AppText variant="caption" color="rgba(255,255,255,0.8)">visitas</AppText>
           </View>
+          <NivelBadge nivel={d.nivel} sobreOscuro grande />
         </View>
         {/* Medidor de visitas (clickeable → línea de tiempo de recompensas) */}
         <Pressable
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
   accionEmoji: { fontSize: 20 },
   accionLabel: { fontWeight: '700' },
   hero: { marginTop: spacing.lg },
-  heroFila: { flexDirection: 'row', justifyContent: 'space-between' },
+  heroFila: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   visitas: { fontSize: 34, lineHeight: 38 },
   heroProg: { marginTop: spacing.md },
   heroSub: { marginTop: spacing.sm },
