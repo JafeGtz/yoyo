@@ -50,19 +50,43 @@ export function DetalleNegocioScreen() {
         </View>
       </View>
 
-      {/* Acciones */}
+      {/* Ubicación */}
+      {d.negocio.direccion && (
+        <View style={styles.direccionRow}>
+          <AppText style={styles.direccionPin}>📍</AppText>
+          <AppText variant="caption" color={colors.textSecondary} style={styles.flex}>{d.negocio.direccion}</AppText>
+        </View>
+      )}
+
+      {/* Acciones como mosaicos */}
       <View style={styles.acciones}>
         {d.negocio.telefono && (
-          <AppButton titulo="📞 Llamar" variante="secundario" style={styles.accion}
-            onPress={() => Linking.openURL(`tel:${d.negocio.telefono}`)} />
+          <Pressable style={styles.accionTile} onPress={() => Linking.openURL(`tel:${d.negocio.telefono}`)}>
+            <View style={[styles.accionIcon, { backgroundColor: colors.mintSoft }]}><AppText style={styles.accionEmoji}>📞</AppText></View>
+            <AppText variant="caption" style={styles.accionLabel}>Llamar</AppText>
+          </Pressable>
         )}
         {(d.negocio.direccion || d.negocio.lat) && (
-          <AppButton titulo="📍 Ver mapa" style={styles.accion}
+          <Pressable
+            style={styles.accionTile}
             onPress={() => Linking.openURL(
               d.negocio.lat != null
                 ? `https://maps.google.com/?q=${d.negocio.lat},${d.negocio.lng}`
                 : `https://maps.google.com/?q=${encodeURIComponent(d.negocio.direccion ?? '')}`,
-            )} />
+            )}
+          >
+            <View style={[styles.accionIcon, { backgroundColor: colors.lavender }]}><AppText style={styles.accionEmoji}>🗺️</AppText></View>
+            <AppText variant="caption" style={styles.accionLabel}>Cómo llegar</AppText>
+          </Pressable>
+        )}
+        {d.negocio.telefono && (
+          <Pressable
+            style={styles.accionTile}
+            onPress={() => Linking.openURL(`https://wa.me/${d.negocio.telefono!.replace(/\D/g, '')}`)}
+          >
+            <View style={[styles.accionIcon, { backgroundColor: '#DCF8E8' }]}><AppText style={styles.accionEmoji}>💬</AppText></View>
+            <AppText variant="caption" style={styles.accionLabel}>WhatsApp</AppText>
+          </Pressable>
         )}
       </View>
 
@@ -258,8 +282,19 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
   },
   flex: { flex: 1 },
-  acciones: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg },
-  accion: { flex: 1 },
+  direccionRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.md,
+    backgroundColor: colors.surface, borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+  },
+  direccionPin: { fontSize: 16 },
+  acciones: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+  accionTile: {
+    flex: 1, backgroundColor: colors.surface, borderRadius: radii.lg,
+    paddingVertical: spacing.md, alignItems: 'center', gap: spacing.xs,
+  },
+  accionIcon: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  accionEmoji: { fontSize: 20 },
+  accionLabel: { fontWeight: '700' },
   hero: { marginTop: spacing.lg },
   heroFila: { flexDirection: 'row', justifyContent: 'space-between' },
   visitas: { fontSize: 34, lineHeight: 38 },
