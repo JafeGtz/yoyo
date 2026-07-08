@@ -124,6 +124,7 @@ export function DetalleNegocioScreen() {
       <View style={styles.accionesGrid}>
         {([
           { on: true, icono: 'star', label: 'Mi carné VIP', go: () => navigation.navigate('CarneFan', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
+          { on: true, icono: 'medal', label: 'Logros', go: () => navigation.navigate('MedalleroNegocio', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
           { on: d.tieneRuleta, icono: 'wheel', label: 'Gira y Gana', go: () => navigation.navigate('Ruleta', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
           { on: d.tieneRasca, icono: 'coin', label: 'Rasca y Gana', go: () => navigation.navigate('Rasca', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },
           { on: d.tieneRetos, icono: 'target', label: 'Retos', go: () => navigation.navigate('Retos', { negocioId: d.negocio.id, nombre: d.negocio.nombre }) },

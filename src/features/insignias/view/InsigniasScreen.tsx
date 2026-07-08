@@ -1,20 +1,15 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { HeroCard } from '../../../shared/ui/HeroCard';
 import { ProgressBar } from '../../../shared/ui/ProgressBar';
-import { Icon, type IconName } from '../../../shared/ui/Icon';
+import { Icon } from '../../../shared/ui/Icon';
+import { iconoDeLogro } from '../../../shared/ui/insigniaIcono';
 import { colors, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useInsigniasViewModel } from '../viewmodel/useInsigniasViewModel';
-
-const ICONOS: Record<string, IconName> = {
-  sparkle: 'sparkles', medal: 'medal', trophy: 'trophy', sunrise: 'sunrise', moon: 'moon',
-  users: 'users', cake: 'cake', compass: 'compass', flame: 'flame', crown: 'crown',
-};
-const iconOf = (icono: string | null): IconName => (icono && ICONOS[icono]) || 'medal';
 
 export function InsigniasScreen() {
   const navigation = useNavigation();
@@ -53,12 +48,12 @@ export function InsigniasScreen() {
             </View>
           </HeroCard>
 
-          {/* Medallero */}
+          {/* Medallero — toca una insignia para ver su leyenda */}
           <View style={styles.grid}>
             {insignias.map(i => (
-              <View key={i.id} style={styles.item}>
+              <Pressable key={i.id} style={styles.item} onPress={() => Alert.alert(i.obtenida ? i.nombre : `${i.nombre} (bloqueada)`, i.descripcion ?? '')}>
                 <View style={[styles.medalla, i.obtenida ? styles.medallaOn : styles.medallaOff]}>
-                  <Icon name={i.obtenida ? iconOf(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.gold : 'rgba(255,255,255,0.35)'} />
+                  <Icon name={i.obtenida ? iconoDeLogro(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.gold : 'rgba(255,255,255,0.35)'} />
                 </View>
                 <AppText
                   variant="caption"
@@ -68,7 +63,7 @@ export function InsigniasScreen() {
                 >
                   {i.nombre}
                 </AppText>
-              </View>
+              </Pressable>
             ))}
           </View>
         </>

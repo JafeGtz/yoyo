@@ -6,19 +6,14 @@ import { AppText } from '../../../shared/ui/AppText';
 import { Card } from '../../../shared/ui/Card';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
-import { Icon, type IconName } from '../../../shared/ui/Icon';
+import { Icon } from '../../../shared/ui/Icon';
+import { iconoDeLogro } from '../../../shared/ui/insigniaIcono';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisNegociosViewModel } from '../viewmodel/useMisNegociosViewModel';
 import { useDescubrirViewModel, type NegocioDir } from '../../descubrir/viewmodel/useDescubrirViewModel';
 import { useInsigniasViewModel } from '../../insignias/viewmodel/useInsigniasViewModel';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
-
-const ICONOS: Record<string, IconName> = {
-  sparkle: 'sparkles', medal: 'medal', trophy: 'trophy', sunrise: 'sunrise', moon: 'moon',
-  users: 'users', cake: 'cake', compass: 'compass', flame: 'flame', crown: 'crown',
-};
-const iconOf = (icono: string | null): IconName => (icono && ICONOS[icono]) || 'medal';
 
 // Paleta de acentos que combinan con el morado (menta, rosa, dorado, turquesa, coral).
 const ACENTOS = [
@@ -65,7 +60,7 @@ export function MisNegociosScreen() {
           <View style={styles.medRow}>
             {medallas.map(m => (
               <View key={m.id} style={[styles.mini, m.obtenida ? styles.miniOn : styles.miniOff]}>
-                <Icon name={m.obtenida ? iconOf(m.icono) : 'lock'} size={20} color={m.obtenida ? colors.gold : colors.textSecondary} />
+                <Icon name={m.obtenida ? iconoDeLogro(m.icono) : 'lock'} size={20} color={m.obtenida ? colors.gold : colors.textSecondary} />
               </View>
             ))}
           </View>
