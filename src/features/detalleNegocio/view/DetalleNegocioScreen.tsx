@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -41,12 +42,33 @@ export function DetalleNegocioScreen() {
 
   return (
     <Screen scroll>
-      <Volver onPress={() => navigation.goBack()} />
+      {/* Banner (portada) tipo header con overlay arriba */}
+      <View style={styles.banner}>
+        {d.negocio.portada_url
+          ? <Image source={{ uri: d.negocio.portada_url }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          : <View style={[StyleSheet.absoluteFill, { backgroundColor: acLogo.fuerte }]} />}
+        {/* Degradado oscuro arriba (para el botón volver) que se desvanece hacia abajo */}
+        <Svg style={StyleSheet.absoluteFill}>
+          <Defs>
+            <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor="#000" stopOpacity="0.5" />
+              <Stop offset="0.45" stopColor="#000" stopOpacity="0.12" />
+              <Stop offset="1" stopColor="#000" stopOpacity="0" />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad)" />
+        </Svg>
+        <Pressable onPress={() => navigation.goBack()} style={styles.volverBanner} hitSlop={12}>
+          <AppText variant="title" color="#fff">‹</AppText>
+        </Pressable>
+      </View>
 
-      {/* Encabezado: logo/inicial + nombre + tipo */}
+      {/* Encabezado: logo redondeado (sobre el banner) + nombre + tipo */}
       <View style={styles.encabezado}>
         <View style={[styles.logo, { backgroundColor: acLogo.fuerte }]}>
-          <AppText variant="title" color="#fff">{inicial}</AppText>
+          {d.negocio.logo_url
+            ? <Image source={{ uri: d.negocio.logo_url }} style={styles.logoImg} />
+            : <AppText variant="title" color="#fff">{inicial}</AppText>}
         </View>
         <View style={styles.flex}>
           <AppText variant="title">{d.negocio.nombre}</AppText>
@@ -237,11 +259,23 @@ function Volver({ onPress }: { onPress: () => void }) {
 const styles = StyleSheet.create({
   loader: { marginTop: spacing.xl },
   volver: { marginBottom: spacing.sm },
-  encabezado: { flexDirection: 'row', alignItems: 'center' },
-  logo: {
-    width: 60, height: 60, borderRadius: 30, backgroundColor: colors.primary,
-    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+  banner: {
+    height: 176, marginTop: -spacing.lg, marginHorizontal: -spacing.lg,
+    backgroundColor: colors.surface, overflow: 'hidden',
   },
+  volverBanner: {
+    position: 'absolute', top: spacing.sm, left: spacing.md,
+    width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.28)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  encabezado: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md },
+  logo: {
+    width: 68, height: 68, borderRadius: 34, backgroundColor: colors.primary,
+    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+    marginTop: -44, borderWidth: 3, borderColor: colors.background, overflow: 'hidden',
+    shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 4,
+  },
+  logoImg: { width: '100%', height: '100%' },
   flex: { flex: 1 },
   direccionRow: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.md,

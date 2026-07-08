@@ -6,7 +6,7 @@ import { supabase } from '../supabase/supabaseClient';
 
 interface FilaCN {
   visitas_totales: number;
-  negocio: { id: string; nombre: string; tipo: string; modelo_acumulacion: string } | null;
+  negocio: { id: string; nombre: string; tipo: string; modelo_acumulacion: string; logo_url: string | null } | null;
   nivel: { nombre: string } | null;
 }
 
@@ -16,7 +16,7 @@ export class NegocioRepositorySupabase implements NegocioRepository {
     const { data, error } = await supabase
       .from('cliente_negocio')
       .select(
-        'visitas_totales, negocio:negocio_id(id, nombre, tipo, modelo_acumulacion), nivel:nivel_membresia_id(nombre)',
+        'visitas_totales, negocio:negocio_id(id, nombre, tipo, modelo_acumulacion, logo_url), nivel:nivel_membresia_id(nombre)',
       )
       .eq('cliente_id', clienteId);
 
@@ -64,6 +64,7 @@ export class NegocioRepositorySupabase implements NegocioRepository {
           id: f.negocio!.id,
           nombre: f.negocio!.nombre,
           tipo: f.negocio!.tipo,
+          logoUrl: f.negocio!.logo_url ?? undefined,
           modeloAcumulacion: f.negocio!.modelo_acumulacion === 'plus' ? 'plus' : 'basico',
         },
         visitasTotales: f.visitas_totales,

@@ -106,7 +106,9 @@ export function MisNegociosScreen() {
                 <Card style={[styles.negocio, { borderLeftWidth: 4, borderLeftColor: ac.fuerte }]}>
                   <View style={styles.negocioFila}>
                     <View style={[styles.avatar, { backgroundColor: ac.fuerte }]}>
-                      <AppText variant="subtitle" color="#fff">{n.negocio.nombre.charAt(0).toUpperCase()}</AppText>
+                      {n.negocio.logoUrl
+                        ? <Image source={{ uri: n.negocio.logoUrl }} style={styles.avatarImg} />
+                        : <AppText variant="subtitle" color="#fff">{n.negocio.nombre.charAt(0).toUpperCase()}</AppText>}
                     </View>
                     <View style={styles.flex}>
                       <AppText variant="subtitle">{n.negocio.nombre}</AppText>
@@ -191,7 +193,8 @@ const styles = StyleSheet.create({
   miniEmoji: { fontSize: 20 },
   negocio: { marginBottom: spacing.md },
   negocioFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  avatar: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  avatarImg: { width: '100%', height: '100%' },
   tipo: { marginBottom: 6 },
   flex: { flex: 1 },
   visitasPill: { alignItems: 'center', borderRadius: radii.md, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },

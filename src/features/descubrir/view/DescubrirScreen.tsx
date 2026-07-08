@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -56,7 +56,9 @@ export function DescubrirScreen() {
           <Pressable key={n.id} onPress={() => navigation.navigate('DetalleNegocio', { negocioId: n.id, nombre: n.nombre })}>
             <SoftCard style={[styles.item, { borderLeftWidth: 4, borderLeftColor: ac.fuerte }]}>
               <View style={[styles.logo, { backgroundColor: ac.fuerte }]}>
-                <AppText variant="subtitle" color="#fff">{n.nombre.charAt(0).toUpperCase()}</AppText>
+                {n.logo_url
+                  ? <Image source={{ uri: n.logo_url }} style={styles.logoImg} />
+                  : <AppText variant="subtitle" color="#fff">{n.nombre.charAt(0).toUpperCase()}</AppText>}
               </View>
               <View style={styles.flex}>
                 <AppText variant="subtitle">{n.nombre}</AppText>
@@ -97,8 +99,9 @@ const styles = StyleSheet.create({
   item: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
   logo: {
     width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primary,
-    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md, overflow: 'hidden',
   },
+  logoImg: { width: '100%', height: '100%' },
   flex: { flex: 1 },
   metaFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 4 },
   tag: { borderRadius: radii.pill, paddingHorizontal: spacing.sm, paddingVertical: 2 },
