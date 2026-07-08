@@ -5,6 +5,9 @@ export const colors = {
   primary: '#4F3CE0',
   primaryDark: '#3A2BB8',
   background: '#FFFFFF',
+  darkBg: '#151833', // fondo oscuro (gamificación / podio)
+  darkSurface: '#20244A', // tarjetas sobre fondo oscuro
+  darkBorder: 'rgba(255,255,255,0.09)',
   lavenderBg: '#EEEBFB', // fondo de onboarding/auth
   surface: '#F4F3FA', // tarjetas claras / filas de ajustes
   lavender: '#ECE9FC', // tarjetas de acento

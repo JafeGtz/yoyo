@@ -52,17 +52,17 @@ export function RifasScreen() {
   }, [perfil?.cliente_id, params.negocioId]);
 
   return (
-    <Screen scroll>
+    <Screen scroll bg={colors.darkBg}>
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
         <AppText variant="title" color={colors.primary}>‹</AppText>
       </Pressable>
-      <AppText variant="title">Rifas</AppText>
-      <AppText variant="body" color={colors.textSecondary} style={styles.sub}>{params.nombre}</AppText>
+      <AppText variant="title" color="#fff">Rifas</AppText>
+      <AppText variant="body" color="rgba(255,255,255,0.6)" style={styles.sub}>{params.nombre}</AppText>
 
       {lista === null ? (
         <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : lista.length === 0 ? (
-        <AppText color={colors.textSecondary} style={styles.vacio}>Este negocio no tiene rifas por ahora.</AppText>
+        <AppText color="rgba(255,255,255,0.6)" style={styles.vacio}>Este negocio no tiene rifas por ahora.</AppText>
       ) : (
         lista.map(r => {
           const participa = visitas >= r.minVisitas;

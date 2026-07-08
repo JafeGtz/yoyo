@@ -99,18 +99,18 @@ export function RuletaScreen() {
   }
 
   return (
-    <Screen scroll>
+    <Screen scroll bg={colors.darkBg}>
       {estado === 'resultado' && gano && <Confetti />}
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
         <AppText variant="title" color={colors.primary}>‹</AppText>
       </Pressable>
-      <AppText variant="title">Gira y Gana</AppText>
-      <AppText variant="body" color={colors.textSecondary} style={styles.sub}>{params.nombre}</AppText>
+      <AppText variant="title" color="#fff">Gira y Gana</AppText>
+      <AppText variant="body" color="rgba(255,255,255,0.6)" style={styles.sub}>{params.nombre}</AppText>
 
       {estado === 'cargando' ? (
         <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : premios.length === 0 ? (
-        <AppText color={colors.textSecondary} style={styles.loader}>Este negocio aún no configuró la ruleta.</AppText>
+        <AppText color="rgba(255,255,255,0.6)" style={styles.loader}>Este negocio aún no configuró la ruleta.</AppText>
       ) : (
         <View style={styles.centro}>
           {/* Puntero */}
@@ -146,9 +146,9 @@ export function RuletaScreen() {
           {estado === 'resultado' && premio && (
             <View style={styles.resultado}>
               <Icon name={gano ? 'trophy' : 'clover'} size={48} color={gano ? colors.gold : colors.textSecondary} />
-              <AppText variant="title" color={gano ? colors.primary : colors.textSecondary}>{gano ? '¡Ganaste!' : '¡Casi!'}</AppText>
-              <AppText variant="subtitle">{premio}</AppText>
-              {detalle ? <AppText variant="caption" color={colors.textSecondary} style={styles.sub}>{detalle}</AppText> : null}
+              <AppText variant="title" color={gano ? colors.gold : "rgba(255,255,255,0.75)"}>{gano ? "¡Ganaste!" : "¡Casi!"}</AppText>
+              <AppText variant="subtitle" color="#fff">{premio}</AppText>
+              {detalle ? <AppText variant="caption" color="rgba(255,255,255,0.7)" style={styles.sub}>{detalle}</AppText> : null}
             </View>
           )}
           {error ? <AppText color={colors.danger} style={styles.error}>{error}</AppText> : null}

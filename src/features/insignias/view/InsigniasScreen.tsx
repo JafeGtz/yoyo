@@ -28,11 +28,11 @@ export function InsigniasScreen() {
   const de = state.status === 'listo' ? state.insignias.length : 0;
 
   return (
-    <Screen scroll>
+    <Screen scroll bg={colors.darkBg}>
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-        <AppText variant="title" color={colors.primary}>‹</AppText>
+        <AppText variant="title" color="#fff">‹</AppText>
       </Pressable>
-      <AppText variant="title">Medallero</AppText>
+      <AppText variant="title" color="#fff">Medallero</AppText>
 
       {state.status === 'cargando' && <ActivityIndicator color={colors.primary} style={styles.loader} />}
       {state.status === 'error' && <AppText color={colors.danger}>{state.mensaje}</AppText>}
@@ -58,12 +58,12 @@ export function InsigniasScreen() {
             {insignias.map(i => (
               <View key={i.id} style={styles.item}>
                 <View style={[styles.medalla, i.obtenida ? styles.medallaOn : styles.medallaOff]}>
-                  <Icon name={i.obtenida ? iconOf(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.gold : colors.textSecondary} />
+                  <Icon name={i.obtenida ? iconOf(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.gold : 'rgba(255,255,255,0.35)'} />
                 </View>
                 <AppText
                   variant="caption"
                   style={styles.nombre}
-                  color={i.obtenida ? colors.textPrimary : colors.textSecondary}
+                  color={i.obtenida ? '#fff' : 'rgba(255,255,255,0.45)'}
                   numberOfLines={2}
                 >
                   {i.nombre}
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF6E0', borderColor: colors.gold,
     shadowColor: colors.gold, shadowOpacity: 0.5, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
-  medallaOff: { backgroundColor: colors.surface, borderColor: colors.border, opacity: 0.7 },
+  medallaOff: { backgroundColor: colors.darkSurface, borderColor: colors.darkBorder },
   medallaEmoji: { fontSize: 38 },
   nombre: { fontWeight: '700', textAlign: 'center' },
 });

@@ -102,21 +102,21 @@ export function RascaScreen() {
   ).current;
 
   return (
-    <Screen scroll>
+    <Screen scroll bg={colors.darkBg}>
       {confeti && <Confetti />}
       <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
         <AppText variant="title" color={colors.primary}>‹</AppText>
       </Pressable>
-      <AppText variant="title">Rasca y Gana</AppText>
-      <AppText variant="body" color={colors.textSecondary} style={styles.sub}>{params.nombre}</AppText>
+      <AppText variant="title" color="#fff">Rasca y Gana</AppText>
+      <AppText variant="body" color="rgba(255,255,255,0.6)" style={styles.sub}>{params.nombre}</AppText>
 
       {cargando ? (
         <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : premios.length === 0 ? (
-        <AppText color={colors.textSecondary} style={styles.loader}>Este negocio aún no configuró el rasca y gana.</AppText>
+        <AppText color="rgba(255,255,255,0.6)" style={styles.loader}>Este negocio aún no configuró el rasca y gana.</AppText>
       ) : (
         <>
-          <AppText variant="caption" color={colors.textSecondary} style={styles.seccion}>Puedes ganar:</AppText>
+          <AppText variant="caption" color="rgba(255,255,255,0.6)" style={styles.seccion}>Puedes ganar:</AppText>
           <View style={styles.chips}>
             {premios.map((p, i) => (
               <View key={i} style={styles.chip}><AppText variant="caption" color={colors.primary}>{p}</AppText></View>
@@ -169,7 +169,7 @@ export function RascaScreen() {
           {revelado ? (
             <AppButton titulo="Listo" onPress={() => navigation.goBack()} style={styles.boton} />
           ) : (
-            <AppText variant="caption" color={colors.textSecondary} style={styles.hint}>Desliza el dedo para rascar</AppText>
+            <AppText variant="caption" color="rgba(255,255,255,0.6)" style={styles.hint}>Desliza el dedo para rascar</AppText>
           )}
         </>
       )}
