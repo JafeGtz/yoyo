@@ -15,27 +15,21 @@ const colorDe = (nombre: string) => AVATARES[[...nombre].reduce((s, c) => s + c.
 const inicial = (n: string) => n.charAt(0).toUpperCase();
 
 interface Fila { cliente_id: string; nombre: string; visitas: number }
-type Periodo = 'hoy' | 'semana' | 'mes';
 
 export function RankingScreen() {
   const { params } = useRoute<RouteProp<ConsumidorStackParams, 'Ranking'>>();
   const navigation = useNavigation();
   const { perfil } = useSession();
-  const [periodo, setPeriodo] = useState<Periodo>('mes');
   const [lista, setLista] = useState<Fila[] | null>(null);
 
   useEffect(() => {
     let vivo = true;
     setLista(null);
-    const ahora = new Date();
-    let desde: Date;
-    if (periodo === 'hoy') desde = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
-    else if (periodo === 'semana') desde = new Date(ahora.getTime() - 7 * 86400000);
-    else desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-    supabase.rpc('ranking_negocio', { p_negocio_id: params.negocioId, p_desde: desde.toISOString() })
+    // Ranking total (quién tiene más visitas en este negocio).
+    supabase.rpc('ranking_negocio', { p_negocio_id: params.negocioId, p_desde: '2000-01-01T00:00:00Z' })
       .then(({ data }) => { if (vivo) setLista((data as Fila[]) ?? []); });
     return () => { vivo = false; };
-  }, [periodo, params.negocioId]);
+  }, [params.negocioId]);
 
   const top3 = lista?.slice(0, 3) ?? [];
   const resto = lista?.slice(3) ?? [];
@@ -45,18 +39,8 @@ export function RankingScreen() {
       <SafeAreaView edges={['top']}>
         <View style={styles.header}>
           <Pressable onPress={() => navigation.goBack()} hitSlop={12}><AppText variant="title" color="#fff">‹</AppText></Pressable>
-          <AppText variant="subtitle" color="#fff">Top del {periodo === 'mes' ? 'mes' : periodo === 'semana' ? 'semana' : 'día'}</AppText>
+          <AppText variant="subtitle" color="#fff" numberOfLines={1}>Ranking · {params.nombre}</AppText>
           <View style={{ width: 20 }} />
-        </View>
-        {/* Tabs de periodo */}
-        <View style={styles.tabs}>
-          {(['hoy', 'semana', 'mes'] as Periodo[]).map(p => (
-            <Pressable key={p} onPress={() => setPeriodo(p)} style={[styles.tab, periodo === p && styles.tabOn]}>
-              <AppText variant="caption" color={periodo === p ? FONDO : 'rgba(255,255,255,0.6)'} style={styles.bold}>
-                {p === 'hoy' ? 'Hoy' : p === 'semana' ? 'Semana' : 'Mes'}
-              </AppText>
-            </Pressable>
-          ))}
         </View>
       </SafeAreaView>
 
