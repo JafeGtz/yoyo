@@ -7,7 +7,7 @@ import { Card, SoftCard } from '../../../shared/ui/Card';
 import { HeroCard } from '../../../shared/ui/HeroCard';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
-import { BeneficiosWallet } from './BeneficiosWallet';
+import { WalletStack } from '../../../shared/ui/WalletStack';
 import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { acentos, colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -147,7 +147,7 @@ export function DetalleNegocioScreen() {
       {d.beneficios.length > 0 && (
         <>
           <SectionHeader titulo={`Tus beneficios aquí · ${d.beneficios.length}`} />
-          <BeneficiosWallet beneficios={d.beneficios} onUsar={setUsando} />
+          <WalletStack items={d.beneficios.map(b => ({ id: b.id, titulo: b.nombre, vence_en: b.vence_en }))} onUsar={setUsando} />
         </>
       )}
 

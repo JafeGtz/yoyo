@@ -4,6 +4,7 @@ import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Icon } from '../../../shared/ui/Icon';
+import { WalletStack } from '../../../shared/ui/WalletStack';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisBeneficiosViewModel } from '../viewmodel/useMisBeneficiosViewModel';
@@ -55,30 +56,19 @@ export function MisBeneficiosScreen() {
             </AppText>
           )}
 
-          {/* Tickets disponibles */}
-          {disponibles.map(b => {
-            const dias = diasRestantes(b.vence_en);
-            const urgente = dias != null && dias <= 3;
-            return (
-              <View key={b.id} style={styles.ticket}>
-                <View style={styles.tira}>
-                  <Icon name="ticket" size={26} color="#fff" />
-                </View>
-                <View style={styles.ticketBody}>
-                  <AppText variant="subtitle" numberOfLines={1}>{b.beneficio?.nombre ?? '—'}</AppText>
-                  <AppText variant="caption" color={colors.textSecondary} numberOfLines={1}>{b.negocio?.nombre ?? ''}</AppText>
-                  {dias != null && (
-                    <AppText variant="caption" color={urgente ? colors.danger : colors.textSecondary}>
-                      {dias <= 0 ? 'vence hoy' : `vence en ${dias} día${dias === 1 ? '' : 's'}`}
-                    </AppText>
-                  )}
-                  <Pressable style={styles.canjear} onPress={() => setUsando({ id: b.id, nombre: b.beneficio?.nombre ?? 'Beneficio' })}>
-                    <AppText variant="caption" color="#fff" style={styles.bold}>Canjear ahora</AppText>
-                  </Pressable>
-                </View>
-              </View>
-            );
-          })}
+          {/* Tickets disponibles — pila estilo billetera */}
+          {disponibles.length > 0 && (
+            <WalletStack
+              items={disponibles.map(b => ({
+                id: b.id,
+                titulo: b.beneficio?.nombre ?? 'Beneficio',
+                subtitulo: b.negocio?.nombre ?? undefined,
+                vence_en: b.vence_en,
+              }))}
+              onUsar={setUsando}
+              textoUsar="Canjear ahora"
+            />
+          )}
 
           {/* Historial */}
           {otros.length > 0 && (
