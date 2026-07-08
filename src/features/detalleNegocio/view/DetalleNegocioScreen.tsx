@@ -7,6 +7,7 @@ import { Card, SoftCard } from '../../../shared/ui/Card';
 import { HeroCard } from '../../../shared/ui/HeroCard';
 import { SectionHeader } from '../../../shared/ui/SectionHeader';
 import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
+import { BeneficiosWallet } from './BeneficiosWallet';
 import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { acentos, colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -142,25 +143,11 @@ export function DetalleNegocioScreen() {
           })}
       </View>
 
-      {/* Beneficios disponibles */}
+      {/* Beneficios disponibles — carrusel tipo billetera */}
       {d.beneficios.length > 0 && (
         <>
-          <SectionHeader titulo="Tus beneficios aquí" />
-          {d.beneficios.map(b => (
-            <SoftCard key={b.id} style={styles.item}>
-              <View style={styles.flex}>
-                <AppText variant="subtitle">{b.nombre}</AppText>
-                {b.vence_en && (
-                  <AppText variant="caption" color={colors.textSecondary}>
-                    Vence {new Date(b.vence_en).toLocaleDateString('es-MX')}
-                  </AppText>
-                )}
-              </View>
-              <Pressable style={styles.usar} onPress={() => setUsando({ id: b.id, nombre: b.nombre })}>
-                <AppText variant="caption" color="#fff" style={styles.bold}>Usar</AppText>
-              </Pressable>
-            </SoftCard>
-          ))}
+          <SectionHeader titulo={`Tus beneficios aquí · ${d.beneficios.length}`} />
+          <BeneficiosWallet beneficios={d.beneficios} onUsar={setUsando} />
         </>
       )}
 
