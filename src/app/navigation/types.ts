@@ -11,6 +11,7 @@ export type ConsumidorStackParams = {
   Retos: { negocioId: string; nombre: string };
   Rifas: { negocioId: string; nombre: string };
   Recompensas: { negocioId: string; nombre: string };
+  CarneFan: { negocioId: string; nombre: string };
   Resena: { negocioId: string; nombre: string };
   Cita: { negocioId: string; nombre: string; modo: 'solicitud' | 'agenda' };
 };

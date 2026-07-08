@@ -117,6 +117,14 @@ export function DetalleNegocioScreen() {
         </Pressable>
       </HeroCard>
 
+      {/* Compartir carné de fan */}
+      <AppButton
+        titulo="📸 Compartir mi carné de fan"
+        variante="secundario"
+        style={styles.ruletaBtn}
+        onPress={() => navigation.navigate('CarneFan', { negocioId: d.negocio.id, nombre: d.negocio.nombre })}
+      />
+
       {/* Gira y Gana */}
       {d.tieneRuleta && (
         <AppButton
