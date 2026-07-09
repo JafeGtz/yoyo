@@ -52,12 +52,15 @@ export function MisBeneficiosScreen() {
         <Pressable
           style={styles.probar}
           hitSlop={8}
-          onPress={async () => {
-            const r = await probarAvisoVencimiento();
-            Alert.alert(
-              r.ok ? 'Aviso programado' : 'No se pudo',
-              r.ok ? 'Llegará en ~30 segundos. Puedes cerrar la app para verlo.' : (r.error ?? 'Error desconocido'),
-            );
+          onPress={() => {
+            // Feedback inmediato: si NO ves este alert, el bundle JS no recargó (rebuild).
+            Alert.alert('Probando…', 'Programando el aviso de prueba.');
+            probarAvisoVencimiento().then(r => {
+              Alert.alert(
+                r.ok ? 'Aviso programado' : 'No se pudo',
+                r.ok ? 'Llegará en ~30 segundos. Puedes cerrar la app para verlo.' : (r.error ?? 'Error desconocido'),
+              );
+            });
           }}
         >
           <Icon name="bell" size={16} color={colors.primary} />

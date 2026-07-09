@@ -1,4 +1,10 @@
-import notifee, { AndroidImportance, TriggerType, type TimestampTrigger } from '@notifee/react-native';
+// Carga perezosa de notifee: si el módulo NATIVO no está compilado (falta el
+// rebuild), el import no rompe la pantalla; el error aparece solo al usarlo.
+type NotifeeLib = typeof import('@notifee/react-native');
+function lib(): NotifeeLib {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return require('@notifee/react-native');
+}
 
 /** Un beneficio del cliente para evaluar su vencimiento. */
 export interface BeneficioAviso {
@@ -9,14 +15,6 @@ export interface BeneficioAviso {
   negocio: string;
 }
 
-let permisoPedido = false;
-
-async function pedirPermiso() {
-  if (permisoPedido) return;
-  permisoPedido = true;
-  try { await notifee.requestPermission(); } catch { /* usuario puede negar */ }
-}
-
 /**
  * Programa notificaciones LOCALES (en el dispositivo, sin backend) para avisar
  * que un beneficio disponible está por vencer. Se recalcula cada vez que se
@@ -24,14 +22,11 @@ async function pedirPermiso() {
  */
 export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
   try {
-    await pedirPermiso();
+    const { default: notifee, AndroidImportance, TriggerType } = lib();
+    await notifee.requestPermission();
     const canal = await notifee.createChannel({
-      id: 'vencimientos',
-      name: 'Beneficios por vencer',
-      importance: AndroidImportance.HIGH,
+      id: 'vencimientos', name: 'Beneficios por vencer', importance: AndroidImportance.HIGH,
     });
-
-    // Limpia los avisos programados previos (evita acumular/duplicar).
     await notifee.cancelTriggerNotifications();
 
     const ahora = Date.now();
@@ -40,52 +35,34 @@ export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
       const vence = new Date(b.vence_en).getTime();
       if (isNaN(vence) || vence <= ahora) continue;
 
-      // Avisar 24h antes; si esa marca ya pasó pero aún no vence, avisar 1h antes.
-      let cuando = vence - 24 * 60 * 60 * 1000;
-      if (cuando <= ahora + 60_000) cuando = vence - 60 * 60 * 1000;
-      if (cuando <= ahora + 60_000) continue; // demasiado cerca, no tiene caso
-
-      const trigger: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: cuando,
-        alarmManager: { allowWhileIdle: true },
-      };
+      let cuando = vence - 24 * 60 * 60 * 1000;      // 24 h antes
+      if (cuando <= ahora + 60_000) cuando = vence - 60 * 60 * 1000; // o 1 h antes
+      if (cuando <= ahora + 60_000) continue;
 
       await notifee.createTriggerNotification(
         {
-          id: `venc-${b.id}`, // id estable: reprogramar reemplaza, no duplica
+          id: `venc-${b.id}`,
           title: 'Tu premio está por vencer',
           body: `${b.nombre} en ${b.negocio} vence pronto. ¡Aprovéchalo!`,
-          android: {
-            channelId: canal,
-            importance: AndroidImportance.HIGH,
-            pressAction: { id: 'default' },
-          },
+          android: { channelId: canal, importance: AndroidImportance.HIGH, pressAction: { id: 'default' } },
         },
-        trigger,
+        { type: TriggerType.TIMESTAMP, timestamp: cuando, alarmManager: { allowWhileIdle: true } },
       );
     }
   } catch { /* sin permisos o módulo no disponible: no bloquea la app */ }
 }
 
 /**
- * MODO PRUEBA: programa una notificación local de ejemplo a ~30 segundos para
- * verificar que las notificaciones locales funcionan en el dispositivo.
- * Devuelve true si quedó programada.
+ * MODO PRUEBA: programa una notificación local a ~30 s. Devuelve el detalle para
+ * poder diagnosticar (módulo nativo faltante, permiso denegado, etc.).
  */
 export async function probarAvisoVencimiento(): Promise<{ ok: boolean; error?: string }> {
   try {
+    const { default: notifee, AndroidImportance, TriggerType } = lib();
     const permiso = await notifee.requestPermission();
     const canal = await notifee.createChannel({
-      id: 'vencimientos',
-      name: 'Beneficios por vencer',
-      importance: AndroidImportance.HIGH,
+      id: 'vencimientos', name: 'Beneficios por vencer', importance: AndroidImportance.HIGH,
     });
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: Date.now() + 30_000,
-      alarmManager: { allowWhileIdle: true },
-    };
     await notifee.createTriggerNotification(
       {
         id: 'venc-prueba',
@@ -93,9 +70,8 @@ export async function probarAvisoVencimiento(): Promise<{ ok: boolean; error?: s
         body: 'Si ves esto, las notificaciones locales funcionan. Puedes cerrar la app.',
         android: { channelId: canal, importance: AndroidImportance.HIGH, pressAction: { id: 'default' } },
       },
-      trigger,
+      { type: TriggerType.TIMESTAMP, timestamp: Date.now() + 30_000, alarmManager: { allowWhileIdle: true } },
     );
-    // authorizationStatus: 1 = permitido, 0/-1 = denegado.
     if (permiso.authorizationStatus <= 0) {
       return { ok: false, error: 'Notificaciones DENEGADAS. Actívalas en Ajustes › la app › Notificaciones.' };
     }
