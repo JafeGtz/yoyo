@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Icon } from '../../../shared/ui/Icon';
 import { WalletStack } from '../../../shared/ui/WalletStack';
+import { programarAvisosVencimiento } from '../../../core/notificaciones/avisosVencimiento';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisBeneficiosViewModel } from '../viewmodel/useMisBeneficiosViewModel';
@@ -29,6 +30,20 @@ export function MisBeneficiosScreen() {
   const beneficios = state.status === 'listo' ? state.beneficios : [];
   const disponibles = beneficios.filter(b => b.estado === 'disponible');
   const otros = beneficios.filter(b => b.estado !== 'disponible');
+
+  // Programa avisos locales de vencimiento cuando cargan los beneficios.
+  useEffect(() => {
+    if (state.status !== 'listo') return;
+    programarAvisosVencimiento(
+      state.beneficios.map(b => ({
+        id: b.id,
+        estado: b.estado,
+        vence_en: b.vence_en,
+        nombre: b.beneficio?.nombre ?? 'Tu premio',
+        negocio: b.negocio?.nombre ?? 'el negocio',
+      })),
+    );
+  }, [state]);
 
   return (
     <Screen scroll>
