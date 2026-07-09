@@ -73,9 +73,9 @@ export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
  * verificar que las notificaciones locales funcionan en el dispositivo.
  * Devuelve true si quedó programada.
  */
-export async function probarAvisoVencimiento(): Promise<boolean> {
+export async function probarAvisoVencimiento(): Promise<{ ok: boolean; error?: string }> {
   try {
-    await pedirPermiso();
+    const permiso = await notifee.requestPermission();
     const canal = await notifee.createChannel({
       id: 'vencimientos',
       name: 'Beneficios por vencer',
@@ -95,8 +95,12 @@ export async function probarAvisoVencimiento(): Promise<boolean> {
       },
       trigger,
     );
-    return true;
-  } catch {
-    return false;
+    // authorizationStatus: 1 = permitido, 0/-1 = denegado.
+    if (permiso.authorizationStatus <= 0) {
+      return { ok: false, error: 'Notificaciones DENEGADAS. Actívalas en Ajustes › la app › Notificaciones.' };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 }

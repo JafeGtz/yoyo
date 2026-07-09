@@ -53,10 +53,10 @@ export function MisBeneficiosScreen() {
           style={styles.probar}
           hitSlop={8}
           onPress={async () => {
-            const ok = await probarAvisoVencimiento();
+            const r = await probarAvisoVencimiento();
             Alert.alert(
-              ok ? 'Aviso programado' : 'No se pudo',
-              ok ? 'Llegará en ~30 segundos. Puedes cerrar la app para verlo.' : 'Revisa el permiso de notificaciones.',
+              r.ok ? 'Aviso programado' : 'No se pudo',
+              r.ok ? 'Llegará en ~30 segundos. Puedes cerrar la app para verlo.' : (r.error ?? 'Error desconocido'),
             );
           }}
         >
