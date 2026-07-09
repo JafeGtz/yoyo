@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
 import { Icon } from '../../../shared/ui/Icon';
 import { WalletStack } from '../../../shared/ui/WalletStack';
-import { programarAvisosVencimiento } from '../../../core/notificaciones/avisosVencimiento';
+import { programarAvisosVencimiento, probarAvisoVencimiento } from '../../../core/notificaciones/avisosVencimiento';
 import { colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { useMisBeneficiosViewModel } from '../viewmodel/useMisBeneficiosViewModel';
@@ -47,7 +47,23 @@ export function MisBeneficiosScreen() {
 
   return (
     <Screen scroll>
-      <AppText variant="title">Mis premios</AppText>
+      <View style={styles.tituloFila}>
+        <AppText variant="title" style={styles.flex}>Mis premios</AppText>
+        <Pressable
+          style={styles.probar}
+          hitSlop={8}
+          onPress={async () => {
+            const ok = await probarAvisoVencimiento();
+            Alert.alert(
+              ok ? 'Aviso programado' : 'No se pudo',
+              ok ? 'Llegará en ~30 segundos. Puedes cerrar la app para verlo.' : 'Revisa el permiso de notificaciones.',
+            );
+          }}
+        >
+          <Icon name="bell" size={16} color={colors.primary} />
+          <AppText variant="caption" color={colors.primary} style={styles.bold}>Probar aviso</AppText>
+        </Pressable>
+      </View>
 
       {state.status === 'cargando' && <ActivityIndicator color={colors.primary} style={styles.loader} />}
       {state.status === 'error' && <AppText color={colors.danger}>{state.mensaje}</AppText>}
@@ -114,6 +130,8 @@ export function MisBeneficiosScreen() {
 }
 
 const styles = StyleSheet.create({
+  tituloFila: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  probar: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.lavender, borderRadius: radii.pill, paddingHorizontal: spacing.md, paddingVertical: 6 },
   loader: { marginTop: spacing.xl },
   vacio: { marginTop: spacing.xl },
   flex: { flex: 1 },

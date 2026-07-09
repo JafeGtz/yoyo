@@ -67,3 +67,36 @@ export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
     }
   } catch { /* sin permisos o módulo no disponible: no bloquea la app */ }
 }
+
+/**
+ * MODO PRUEBA: programa una notificación local de ejemplo a ~30 segundos para
+ * verificar que las notificaciones locales funcionan en el dispositivo.
+ * Devuelve true si quedó programada.
+ */
+export async function probarAvisoVencimiento(): Promise<boolean> {
+  try {
+    await pedirPermiso();
+    const canal = await notifee.createChannel({
+      id: 'vencimientos',
+      name: 'Beneficios por vencer',
+      importance: AndroidImportance.HIGH,
+    });
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: Date.now() + 30_000,
+      alarmManager: { allowWhileIdle: true },
+    };
+    await notifee.createTriggerNotification(
+      {
+        id: 'venc-prueba',
+        title: 'Prueba: tu premio está por vencer',
+        body: 'Si ves esto, las notificaciones locales funcionan. Puedes cerrar la app.',
+        android: { channelId: canal, importance: AndroidImportance.HIGH, pressAction: { id: 'default' } },
+      },
+      trigger,
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
