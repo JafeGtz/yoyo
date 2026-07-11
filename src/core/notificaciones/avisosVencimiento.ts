@@ -22,7 +22,7 @@ export interface BeneficioAviso {
  */
 export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
   try {
-    const { default: notifee, AndroidImportance, TriggerType } = lib();
+    const { default: notifee, AndroidImportance, TriggerType, AlarmType } = lib();
     await notifee.requestPermission();
     const canal = await notifee.createChannel({
       id: 'vencimientos', name: 'Beneficios por vencer', importance: AndroidImportance.HIGH,
@@ -46,7 +46,8 @@ export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
           body: `${b.nombre} en ${b.negocio} vence pronto. ¡Aprovéchalo!`,
           android: { channelId: canal, importance: AndroidImportance.HIGH, pressAction: { id: 'default' } },
         },
-        { type: TriggerType.TIMESTAMP, timestamp: cuando, alarmManager: { allowWhileIdle: true } },
+        // Alarma INEXACTA (no requiere permiso de exact alarm en Android 12+/14).
+        { type: TriggerType.TIMESTAMP, timestamp: cuando, alarmManager: { type: AlarmType.SET_AND_ALLOW_WHILE_IDLE } },
       );
     }
   } catch { /* sin permisos o módulo no disponible: no bloquea la app */ }
@@ -58,7 +59,7 @@ export async function programarAvisosVencimiento(items: BeneficioAviso[]) {
  */
 export async function probarAvisoVencimiento(): Promise<{ ok: boolean; error?: string }> {
   try {
-    const { default: notifee, AndroidImportance, TriggerType } = lib();
+    const { default: notifee, AndroidImportance, TriggerType, AlarmType } = lib();
     const permiso = await notifee.requestPermission();
     const canal = await notifee.createChannel({
       id: 'vencimientos', name: 'Beneficios por vencer', importance: AndroidImportance.HIGH,
@@ -70,7 +71,8 @@ export async function probarAvisoVencimiento(): Promise<{ ok: boolean; error?: s
         body: 'Si ves esto, las notificaciones locales funcionan. Puedes cerrar la app.',
         android: { channelId: canal, importance: AndroidImportance.HIGH, pressAction: { id: 'default' } },
       },
-      { type: TriggerType.TIMESTAMP, timestamp: Date.now() + 30_000, alarmManager: { allowWhileIdle: true } },
+      // Alarma INEXACTA (no requiere permiso de exact alarm en Android 12+/14).
+      { type: TriggerType.TIMESTAMP, timestamp: Date.now() + 30_000, alarmManager: { type: AlarmType.SET_AND_ALLOW_WHILE_IDLE } },
     );
     if (permiso.authorizationStatus <= 0) {
       return { ok: false, error: 'Notificaciones DENEGADAS. Actívalas en Ajustes › la app › Notificaciones.' };
