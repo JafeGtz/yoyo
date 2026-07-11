@@ -6,6 +6,7 @@ import { AppText } from '../../../shared/ui/AppText';
 import { AppButton } from '../../../shared/ui/AppButton';
 import { QrScanner } from '../../../shared/ui/QrScanner';
 import { Icon } from '../../../shared/ui/Icon';
+import { obtenerUbicacion } from '../../../core/ubicacion/obtenerUbicacion';
 import { colors, radii, spacing } from '../../../shared/theme';
 import {
   registrarVisita, ApiError, catalogoDelNegocio, marcarProductoVisita,
@@ -42,7 +43,8 @@ export function EscanearScreen() {
   async function intentar(qrToken: string, cod?: string) {
     setEstado('procesando');
     try {
-      const r = await registrarVisita(qrToken, undefined, cod);
+      const ubic = await obtenerUbicacion(); // null si el usuario la niega o falla
+      const r = await registrarVisita(qrToken, ubic ?? undefined, cod);
       setResultado(r);
       setEstado('exito');
     } catch (e) {
