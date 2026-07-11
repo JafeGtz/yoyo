@@ -25,6 +25,7 @@ const SECCIONES = [
   ]},
   { grupo: 'Cuenta', items: [
     { href: '/personal', label: 'Personal', icon: '🧑‍💼' },
+    { href: '/turnos', label: 'Turnos y asistencia', icon: '🗓️' },
     { href: '/reportes', label: 'Reportes', icon: '📈' },
     { href: '/ayuda', label: 'Centro de ayuda', icon: '💬' },
   ]},

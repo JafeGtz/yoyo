@@ -5,6 +5,7 @@ export interface Perfil {
   rol: 'consumidor' | 'personal' | 'dueno' | 'admin' | null;
   cliente_id?: string;
   negocio_id?: string;
+  usuario_negocio_id?: string;
   nombre?: string;
   foto_url?: string | null;
 }

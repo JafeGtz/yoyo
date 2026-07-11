@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Screen } from '../../../shared/ui/Screen';
 import { AppText } from '../../../shared/ui/AppText';
@@ -10,12 +10,14 @@ import { colors, radii, spacing } from '../../../shared/theme';
 import { cerrarSesion } from '../../../core/auth/authService';
 import { useSession } from '../../../core/auth/SessionProvider';
 import { canjearBeneficio, generarCodigoVisita, type ResultadoCanje } from '../../../data/services/canjeService';
+import { useAsistencia } from '../viewmodel/useAsistencia';
 
 const FONDO = '#15131F';
 type Estado = 'escaneando' | 'procesando' | 'exito' | 'error';
 
 export function EmpleadoScreen() {
   const { perfil } = useSession();
+  const asist = useAsistencia(perfil?.usuario_negocio_id, perfil?.negocio_id);
   const [estado, setEstado] = useState<Estado>('escaneando');
   const [resultado, setResultado] = useState<ResultadoCanje | null>(null);
   const [error, setError] = useState('');
@@ -94,7 +96,21 @@ export function EmpleadoScreen() {
       <SafeAreaView style={styles.header} edges={['top']} pointerEvents="box-none">
         <View style={styles.headerFila}>
           <AppText variant="subtitle" color="#fff">Confirmar canje</AppText>
-          <AppText variant="caption" color="rgba(255,255,255,0.8)" onPress={cerrarSesion}>Salir</AppText>
+          <View style={styles.headerDer}>
+            {perfil?.usuario_negocio_id && (
+              <Pressable
+                onPress={asist.marcar}
+                disabled={asist.cargando || asist.guardando}
+                style={[styles.asistChip, asist.abierta ? styles.asistDentro : styles.asistFuera]}
+              >
+                <Icon name={asist.abierta ? 'check2' : 'hash'} size={14} color="#fff" />
+                <AppText variant="caption" color="#fff" style={styles.bold}>
+                  {asist.cargando ? '…' : asist.abierta ? 'Marcar salida' : 'Marcar entrada'}
+                </AppText>
+              </Pressable>
+            )}
+            <AppText variant="caption" color="rgba(255,255,255,0.8)" onPress={cerrarSesion}>Salir</AppText>
+          </View>
         </View>
       </SafeAreaView>
 
@@ -139,6 +155,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
+  headerDer: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  asistChip: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: radii.pill, paddingHorizontal: spacing.md, paddingVertical: 6 },
+  asistFuera: { backgroundColor: colors.mint },
+  asistDentro: { backgroundColor: '#FF7A59' },
+  bold: { fontWeight: '700' },
   centroClaro: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   exitoTitulo: { marginTop: spacing.md },
   detalle: { alignItems: 'center', marginTop: spacing.lg, backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.lg, alignSelf: 'stretch' },
