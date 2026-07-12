@@ -4,7 +4,7 @@ import { AppText } from './AppText';
 import { colors, radii } from '../theme';
 
 /** Píldora pequeña (por defecto dorada, como el badge de membresía). */
-export function Badge({ label, color = colors.gold }: { label: string; color?: string }) {
+export function Badge({ label, color = colors.mint }: { label: string; color?: string }) {
   return (
     <View style={[styles.badge, { backgroundColor: color }]}>
       <AppText variant="caption" color="#fff" style={styles.texto}>

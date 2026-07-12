@@ -50,26 +50,26 @@ export function MedalleroNegocioScreen() {
       <AppText variant="body" color="rgba(255,255,255,0.6)" style={styles.sub}>{params.nombre}</AppText>
 
       {lista === null ? (
-        <ActivityIndicator color={colors.gold} style={styles.loader} />
+        <ActivityIndicator color={colors.mint} style={styles.loader} />
       ) : (
         <>
           {/* Progreso */}
           <View style={styles.resumen}>
             <View style={styles.resFila}>
-              <Icon name="trophy" size={34} color={colors.gold} />
+              <Icon name="trophy" size={34} color={colors.mint} />
               <View style={styles.flex}>
                 <AppText variant="title" color="#fff">{ganadas} de {total}</AppText>
                 <AppText variant="caption" color="rgba(255,255,255,0.75)">logros desbloqueados</AppText>
               </View>
             </View>
-            <View style={styles.barra}><ProgressBar valor={total > 0 ? ganadas / total : 0} color={colors.gold} /></View>
+            <View style={styles.barra}><ProgressBar valor={total > 0 ? ganadas / total : 0} color={colors.mint} /></View>
           </View>
 
           {/* Lista de logros con leyenda */}
           {lista.map(l => (
             <View key={l.id} style={[styles.fila, l.obtenida ? styles.filaOn : styles.filaOff]}>
               <View style={[styles.medalla, l.obtenida ? styles.medOn : styles.medOff]}>
-                <Icon name={l.obtenida ? iconoDeLogro(l.icono) : 'lock'} size={26} color={l.obtenida ? colors.gold : 'rgba(255,255,255,0.35)'} />
+                <Icon name={l.obtenida ? iconoDeLogro(l.icono) : 'lock'} size={26} color={l.obtenida ? colors.mint : 'rgba(255,255,255,0.35)'} />
               </View>
               <View style={styles.flex}>
                 <AppText variant="subtitle" color={l.obtenida ? '#fff' : 'rgba(255,255,255,0.7)'}>{l.nombre}</AppText>
@@ -97,10 +97,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.md,
     borderRadius: radii.lg, padding: spacing.md,
   },
-  filaOn: { backgroundColor: 'rgba(215,165,60,0.12)', borderWidth: 1, borderColor: 'rgba(215,165,60,0.35)' },
+  filaOn: { backgroundColor: 'rgba(52,214,168,0.12)', borderWidth: 1, borderColor: 'rgba(52,214,168,0.35)' },
   filaOff: { backgroundColor: 'rgba(255,255,255,0.04)' },
   medalla: { width: M, height: M, borderRadius: M / 2, alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
-  medOn: { backgroundColor: '#2A2418', borderColor: colors.gold },
+  medOn: { backgroundColor: colors.darkSurface, borderColor: colors.mint },
   medOff: { backgroundColor: colors.darkSurface, borderColor: colors.darkBorder },
   leyenda: { marginTop: 2, lineHeight: 17 },
 });

@@ -75,7 +75,7 @@ export function PremioPopup() {
             </Animated.View>
           ) : (
             <Animated.View style={{ alignItems: 'center', alignSelf: 'stretch', transform: [{ scale: premioScale }] }}>
-              <Icon name="trophy" size={52} color={colors.gold} />
+              <Icon name="trophy" size={52} color={colors.mint} />
               <AppText variant="title" color={colors.primary}>¡Ganaste!</AppText>
               {premios.map(p => (
                 <View key={p.id} style={styles.item}>

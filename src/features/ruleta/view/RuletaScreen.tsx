@@ -21,7 +21,7 @@ const ERRORES: Record<string, string> = {
 };
 
 // Colores vibrantes para los gajos de la rueda.
-const GAJOS = ['#4F3CE0', '#34D6A8', '#FB3D93', '#F5B731', '#7C5CFC', '#00BCD4', '#FF7A59', '#9B5DE5'];
+const GAJOS = ['#4F3CE0', '#34D6A8', '#7C5CFC', '#159A78', '#3A2BB8', '#5FE0BC', '#8B79F0', '#0F7A5E'];
 
 const SIZE = 300;
 const R = SIZE / 2;
@@ -145,8 +145,8 @@ export function RuletaScreen() {
 
           {estado === 'resultado' && premio && (
             <View style={styles.resultado}>
-              <Icon name={gano ? 'trophy' : 'clover'} size={48} color={gano ? colors.gold : colors.textSecondary} />
-              <AppText variant="title" color={gano ? colors.gold : "rgba(255,255,255,0.75)"}>{gano ? "¡Ganaste!" : "¡Casi!"}</AppText>
+              <Icon name={gano ? 'trophy' : 'clover'} size={48} color={gano ? colors.mint : colors.textSecondary} />
+              <AppText variant="title" color={gano ? colors.mint : "rgba(255,255,255,0.75)"}>{gano ? "¡Ganaste!" : "¡Casi!"}</AppText>
               <AppText variant="subtitle" color="#fff">{premio}</AppText>
               {detalle ? <AppText variant="caption" color="rgba(255,255,255,0.7)" style={styles.sub}>{detalle}</AppText> : null}
             </View>

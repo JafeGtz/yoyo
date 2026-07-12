@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, StyleSheet, View } from 'react-native';
 
-const COLORS = ['#4F3CE0', '#34D6A8', '#FB3D93', '#F5B731', '#7C5CFC', '#00BCD4', '#FF7A59'];
+const COLORS = ['#4F3CE0', '#34D6A8', '#7C5CFC', '#5FE0BC', '#3A2BB8'];
 const { width, height } = Dimensions.get('window');
 
 /** Ráfaga de confeti (cae desde arriba). Reproduce al montar. */

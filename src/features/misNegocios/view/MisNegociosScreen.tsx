@@ -21,10 +21,6 @@ import type { ConsumidorStackParams } from '../../../app/navigation/types';
 const ACENTOS = [
   { fuerte: '#4F3CE0', suave: '#ECE9FC' },
   { fuerte: '#34D6A8', suave: '#DAF6EE' },
-  { fuerte: '#FB3D93', suave: '#FEE1EE' },
-  { fuerte: '#F5B731', suave: '#FDF0D3' },
-  { fuerte: '#00BCD4', suave: '#D6F4F8' },
-  { fuerte: '#FF7A59', suave: '#FFE5DD' },
 ];
 
 export function MisNegociosScreen() {
@@ -78,7 +74,7 @@ export function MisNegociosScreen() {
         <Pressable style={styles.medallero} onPress={() => navigation.navigate('Insignias')}>
           <View style={styles.medFila}>
             <View style={styles.medTit}>
-              <Icon name="trophy" size={18} color={colors.gold} />
+              <Icon name="trophy" size={18} color={colors.mint} />
               <AppText variant="subtitle">Medallero</AppText>
             </View>
             <AppText variant="caption" color={colors.primary} style={styles.bold}>{medTotal}/{medDe} · Ver todo ›</AppText>
@@ -86,7 +82,7 @@ export function MisNegociosScreen() {
           <View style={styles.medRow}>
             {medallas.map(m => (
               <View key={m.id} style={[styles.mini, m.obtenida ? styles.miniOn : styles.miniOff]}>
-                <Icon name={m.obtenida ? iconoDeLogro(m.icono) : 'lock'} size={20} color={m.obtenida ? colors.gold : colors.textSecondary} />
+                <Icon name={m.obtenida ? iconoDeLogro(m.icono) : 'lock'} size={20} color={m.obtenida ? colors.mint : colors.textSecondary} />
               </View>
             ))}
           </View>
@@ -181,7 +177,7 @@ const styles = StyleSheet.create({
   },
   campanaBadge: {
     position: 'absolute', top: 4, right: 4, minWidth: 18, height: 18, borderRadius: 9,
-    backgroundColor: colors.pink, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4,
+    backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4,
     borderWidth: 2, borderColor: colors.background,
   },
   campanaNum: { fontWeight: '800', fontSize: 10 },
@@ -190,7 +186,7 @@ const styles = StyleSheet.create({
   medTit: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   medRow: { flexDirection: 'row', gap: spacing.sm },
   mini: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 2 },
-  miniOn: { backgroundColor: '#FFF6E0', borderColor: colors.gold },
+  miniOn: { backgroundColor: '#DAF6EE', borderColor: colors.mint },
   miniOff: { backgroundColor: colors.white, borderColor: colors.border, opacity: 0.7 },
   miniEmoji: { fontSize: 20 },
   negocio: { marginBottom: spacing.md },

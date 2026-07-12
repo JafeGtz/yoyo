@@ -55,7 +55,7 @@ export function ResenaScreen() {
       <View style={styles.estrellas}>
         {[1, 2, 3, 4, 5].map(n => (
           <Pressable key={n} onPress={() => setEstrellas(n)} hitSlop={6}>
-            <Icon name="star" size={40} color={n <= estrellas ? colors.star : colors.border} />
+            <Icon name="star" size={40} color={n <= estrellas ? colors.mint : colors.border} />
           </Pressable>
         ))}
       </View>

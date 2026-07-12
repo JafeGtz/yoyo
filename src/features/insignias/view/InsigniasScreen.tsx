@@ -37,14 +37,14 @@ export function InsigniasScreen() {
           {/* Resumen tipo trofeo */}
           <HeroCard style={styles.hero}>
             <View style={styles.heroFila}>
-              <Icon name="trophy" size={40} color={colors.gold} />
+              <Icon name="trophy" size={40} color={colors.mint} />
               <View style={styles.heroTxt}>
                 <AppText variant="title" color="#fff">{total} de {de}</AppText>
                 <AppText variant="caption" color="rgba(255,255,255,0.85)">insignias desbloqueadas</AppText>
               </View>
             </View>
             <View style={styles.heroBar}>
-              <ProgressBar valor={de > 0 ? total / de : 0} color={colors.gold} />
+              <ProgressBar valor={de > 0 ? total / de : 0} color={colors.mint} />
             </View>
           </HeroCard>
 
@@ -53,7 +53,7 @@ export function InsigniasScreen() {
             {insignias.map(i => (
               <Pressable key={i.id} style={styles.item} onPress={() => Alert.alert(i.obtenida ? i.nombre : `${i.nombre} (bloqueada)`, i.descripcion ?? '')}>
                 <View style={[styles.medalla, i.obtenida ? styles.medallaOn : styles.medallaOff]}>
-                  <Icon name={i.obtenida ? iconoDeLogro(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.gold : 'rgba(255,255,255,0.35)'} />
+                  <Icon name={i.obtenida ? iconoDeLogro(i.icono) : 'lock'} size={34} color={i.obtenida ? colors.mint : 'rgba(255,255,255,0.35)'} />
                 </View>
                 <AppText
                   variant="caption"
@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm, borderWidth: 3,
   },
   medallaOn: {
-    backgroundColor: '#FFF6E0', borderColor: colors.gold,
-    shadowColor: colors.gold, shadowOpacity: 0.5, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5,
+    backgroundColor: '#DAF6EE', borderColor: colors.mint,
+    shadowColor: colors.mint, shadowOpacity: 0.5, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
   medallaOff: { backgroundColor: colors.darkSurface, borderColor: colors.darkBorder },
   medallaEmoji: { fontSize: 38 },

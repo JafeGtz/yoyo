@@ -10,7 +10,7 @@ import { supabase } from '../../../data/supabase/supabaseClient';
 import type { ConsumidorStackParams } from '../../../app/navigation/types';
 
 const FONDO = '#151833';
-const AVATARES = ['#FB3D93', '#F5B731', '#34D6A8', '#7C5CFC', '#00BCD4', '#FF7A59', '#4F3CE0'];
+const AVATARES = ['#4F3CE0', '#34D6A8', '#7C5CFC', '#159A78'];
 const colorDe = (nombre: string) => AVATARES[[...nombre].reduce((s, c) => s + c.charCodeAt(0), 0) % AVATARES.length];
 const inicial = (n: string) => n.charAt(0).toUpperCase();
 
@@ -69,7 +69,7 @@ export function RankingScreen() {
                   </View>
                   <AppText variant="body" color="#fff" style={styles.flex} numberOfLines={1}>{f.nombre}{yo ? ' (tú)' : ''}</AppText>
                   <View style={styles.xpFila}>
-                    <Icon name="star" size={14} color="#F5B731" />
+                    <Icon name="star" size={14} color="#34D6A8" />
                     <AppText variant="caption" color="rgba(255,255,255,0.6)" style={styles.bold}>{f.visitas} vis</AppText>
                   </View>
                 </View>
@@ -85,19 +85,19 @@ export function RankingScreen() {
 function Puesto({ row, lugar }: { row?: Fila; lugar: 1 | 2 | 3 }) {
   if (!row) return <View style={styles.col} />;
   const size = lugar === 1 ? 86 : 64;
-  const anillo = lugar === 1 ? '#FB3D93' : lugar === 2 ? '#F5B731' : '#FF7A59';
+  const anillo = lugar === 1 ? '#4F3CE0' : lugar === 2 ? '#34D6A8' : '#7C5CFC';
   const bloqueH = lugar === 1 ? 118 : lugar === 2 ? 84 : 62;
   return (
     <View style={styles.col}>
-      {lugar === 1 && <Icon name="crown" size={30} color="#F5B731" />}
+      {lugar === 1 && <Icon name="crown" size={30} color="#34D6A8" />}
       <View style={[styles.anillo, { width: size + 8, height: size + 8, borderRadius: (size + 8) / 2, borderColor: anillo }]}>
         <View style={[styles.avatar, { width: size, height: size, borderRadius: size / 2, backgroundColor: colorDe(row.nombre) }]}>
           <AppText variant="title" color="#fff">{inicial(row.nombre)}</AppText>
         </View>
       </View>
       <View style={styles.xpPill}>
-        <Icon name="star" size={12} color="#F5B731" />
-        <AppText variant="caption" color="#F5B731" style={styles.bold}>{row.visitas}</AppText>
+        <Icon name="star" size={12} color="#34D6A8" />
+        <AppText variant="caption" color="#34D6A8" style={styles.bold}>{row.visitas}</AppText>
       </View>
       <AppText variant="caption" color="#fff" style={[styles.nombrePodio, styles.bold]} numberOfLines={1}>{row.nombre}</AppText>
       <View style={[styles.bloque, { height: bloqueH }, lugar === 1 && styles.bloque1]}>

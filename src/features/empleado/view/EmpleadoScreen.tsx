@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   headerDer: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   asistChip: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: radii.pill, paddingHorizontal: spacing.md, paddingVertical: 6 },
   asistFuera: { backgroundColor: colors.mint },
-  asistDentro: { backgroundColor: '#FF7A59' },
+  asistDentro: { backgroundColor: colors.primary },
   bold: { fontWeight: '700' },
   centroClaro: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   exitoTitulo: { marginTop: spacing.md },

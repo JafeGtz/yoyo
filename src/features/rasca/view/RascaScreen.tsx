@@ -130,7 +130,7 @@ export function RascaScreen() {
                 <AppText color={colors.danger} style={styles.center}>{error}</AppText>
               ) : (
                 <>
-                  <Icon name={revelado ? (gano ? 'trophy' : 'clover') : 'gift'} size={48} color={revelado && gano ? colors.gold : colors.textSecondary} />
+                  <Icon name={revelado ? (gano ? 'trophy' : 'clover') : 'gift'} size={48} color={revelado && gano ? colors.mint : colors.textSecondary} />
                   {premio ? (
                     <>
                       {revelado && (
