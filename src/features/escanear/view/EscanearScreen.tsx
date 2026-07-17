@@ -7,6 +7,7 @@ import { AppButton } from '../../../shared/ui/AppButton';
 import { QrScanner } from '../../../shared/ui/QrScanner';
 import { Icon } from '../../../shared/ui/Icon';
 import { obtenerUbicacion } from '../../../core/ubicacion/obtenerUbicacion';
+import { ResenaPopup } from '../../resena/view/ResenaPopup';
 import { colors, radii, spacing } from '../../../shared/theme';
 import {
   registrarVisita, ApiError, catalogoDelNegocio, marcarProductoVisita,
@@ -25,6 +26,7 @@ export function EscanearScreen() {
   const [error, setError] = useState('');
   const [productos, setProductos] = useState<ProductoOpcion[]>([]);
   const [productoElegido, setProductoElegido] = useState<string | null>(null);
+  const [resenaVista, setResenaVista] = useState(false);
 
   // Al registrar la visita, carga el catálogo para poder etiquetar el producto.
   useEffect(() => {
@@ -74,6 +76,7 @@ export function EscanearScreen() {
     setToken('');
     setProductos([]);
     setProductoElegido(null);
+    setResenaVista(false);
     setEstado('escaneando');
   }
 
@@ -113,6 +116,13 @@ export function EscanearScreen() {
 
           <AppButton titulo="Listo" onPress={reiniciar} style={styles.botonClaro} />
         </View>
+
+        {/* Popup de reseña rápida (opcional, se guarda privada) */}
+        <ResenaPopup
+          negocioId={resultado.negocio_id}
+          visible={!resenaVista}
+          onClose={() => setResenaVista(true)}
+        />
       </Screen>
     );
   }
