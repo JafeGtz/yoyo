@@ -11,6 +11,7 @@ import { MedidorVisitas } from '../../../shared/ui/MedidorVisitas';
 import { WalletStack } from '../../../shared/ui/WalletStack';
 import { NivelBadge } from '../../../shared/ui/NivelBadge';
 import { CatalogoGrid } from '../../catalogo/view/CatalogoGrid';
+import { ResenasNegocio } from './ResenasNegocio';
 import { Icon, type IconName } from '../../../shared/ui/Icon';
 import { acentos, colors, radii, spacing } from '../../../shared/theme';
 import { useSession } from '../../../core/auth/SessionProvider';
@@ -220,6 +221,9 @@ export function DetalleNegocioScreen() {
           <CatalogoGrid items={d.catalogo.slice(0, 4)} />
         </>
       )}
+
+      {/* Lo que dicen los clientes (reseñas aprobadas) */}
+      <ResenasNegocio negocioId={d.negocio.id} />
 
       {/* Historial */}
       {d.visitas.length > 0 && (
