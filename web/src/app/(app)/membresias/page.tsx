@@ -17,7 +17,7 @@ export default async function MembresiasPage() {
       .select('id, nombre, nivel_membresia_id')
       .eq('negocio_id', negocio!.id)
       .not('nivel_membresia_id', 'is', null),
-    supabase.from('negocio').select('nivel_criterio').eq('id', negocio!.id).single(),
+    supabase.from('negocio').select('nivel_criterio, dias_baja_nivel').eq('id', negocio!.id).single(),
   ]);
 
   return (
@@ -26,6 +26,7 @@ export default async function MembresiasPage() {
       inicial={(niveles as Nivel[]) ?? []}
       beneficiosPorNivel={(beneficios as { id: string; nombre: string; nivel_membresia_id: string }[]) ?? []}
       criterioInicial={(neg?.nivel_criterio as Criterio) ?? 'visitas'}
+      diasBajaInicial={(neg as { dias_baja_nivel: number | null } | null)?.dias_baja_nivel ?? 0}
     />
   );
 }

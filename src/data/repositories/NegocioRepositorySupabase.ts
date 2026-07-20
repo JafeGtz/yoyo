@@ -13,6 +13,10 @@ interface FilaCN {
 /** Implementación real contra Supabase (protegida por RLS). */
 export class NegocioRepositorySupabase implements NegocioRepository {
   async obtenerMisNegocios(clienteId: string): Promise<Result<ProgresoNegocio[]>> {
+    // Revalida niveles por inactividad (baja uno si aplica). Barato: solo escribe
+    // cuando de verdad baja de nivel; se corre al cargar la pantalla.
+    await supabase.rpc('revalidar_niveles', { p_cliente_id: clienteId });
+
     const { data, error } = await supabase
       .from('cliente_negocio')
       .select(

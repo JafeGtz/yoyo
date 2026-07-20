@@ -30,14 +30,18 @@ export function MembresiasClient({
   inicial,
   beneficiosPorNivel,
   criterioInicial,
+  diasBajaInicial,
 }: {
   negocioId: string;
   inicial: Nivel[];
   beneficiosPorNivel: BeneficioNivel[];
   criterioInicial: Criterio;
+  diasBajaInicial: number;
 }) {
   const supabase = createClient();
   const [criterio, setCriterio] = useState<Criterio>(criterioInicial);
+  const [diasBaja, setDiasBaja] = useState(String(diasBajaInicial ?? 0));
+  const [diasMsg, setDiasMsg] = useState('');
   const [lista, setLista] = useState<Nivel[]>(inicial);
   const [nombre, setNombre] = useState('');
   const [umbral, setUmbral] = useState('0');
@@ -67,6 +71,13 @@ export function MembresiasClient({
     setCriterio(nuevo);
     await supabase.from('negocio').update({ nivel_criterio: nuevo }).eq('id', negocioId);
     await recalcular();
+  }
+
+  async function guardarDiasBaja() {
+    const n = parseInt(diasBaja, 10);
+    const valor = isNaN(n) || n <= 0 ? null : n;
+    await supabase.from('negocio').update({ dias_baja_nivel: valor }).eq('id', negocioId);
+    setDiasMsg(valor ? `Guardado: baja un nivel tras ${valor} días sin visitar.` : 'Guardado: el nivel no baja por inactividad.');
   }
 
   function campoUmbral(nombreCampo: 'nuevo' | 'edit') {
@@ -144,6 +155,20 @@ export function MembresiasClient({
               <div className="mt-0.5 text-xs text-gray-500">{d}</div>
             </button>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mb-6">
+        <h3 className="font-medium text-gray-900">¿Baja de nivel por inactividad?</h3>
+        <p className="mt-1 mb-3 text-sm text-gray-500">
+          Si un cliente deja de visitarte, baja <strong>un nivel</strong> tras los días que definas. Pon <strong>0</strong> para que nunca baje.
+        </p>
+        <div className="flex flex-wrap items-end gap-3">
+          <Field label="Días sin visitar">
+            <Input type="number" min={0} value={diasBaja} onChange={e => setDiasBaja(e.target.value)} className="w-32" />
+          </Field>
+          <Button type="button" variant="secondary" onClick={guardarDiasBaja}>Guardar</Button>
+          {diasMsg && <span className="pb-2 text-sm text-gray-500">{diasMsg}</span>}
         </div>
       </Card>
 
