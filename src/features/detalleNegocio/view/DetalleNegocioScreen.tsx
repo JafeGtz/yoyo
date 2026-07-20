@@ -170,13 +170,16 @@ export function DetalleNegocioScreen() {
           })}
       </View>
 
-      {/* Beneficios disponibles — carrusel tipo billetera */}
-      {d.beneficios.length > 0 && (
-        <>
-          <SectionHeader titulo={`Tus beneficios aquí · ${d.beneficios.length}`} />
-          <WalletStack items={d.beneficios.map(b => ({ id: b.id, titulo: b.nombre, vence_en: b.vence_en }))} onUsar={setUsando} />
-        </>
-      )}
+      {/* Beneficios disponibles — carrusel tipo billetera (oculta los vencidos) */}
+      {(() => {
+        const vigentes = d.beneficios.filter(b => !b.vence_en || new Date(b.vence_en).getTime() >= Date.now());
+        return vigentes.length > 0 ? (
+          <>
+            <SectionHeader titulo={`Tus beneficios aquí · ${vigentes.length}`} />
+            <WalletStack items={vigentes.map(b => ({ id: b.id, titulo: b.nombre, vence_en: b.vence_en }))} onUsar={setUsando} />
+          </>
+        ) : null;
+      })()}
 
       {/* Info */}
       {d.negocio.direccion && (

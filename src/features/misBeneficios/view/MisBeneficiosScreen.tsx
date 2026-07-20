@@ -28,8 +28,10 @@ export function MisBeneficiosScreen() {
   const [usando, setUsando] = useState<{ id: string; nombre: string } | null>(null);
 
   const beneficios = state.status === 'listo' ? state.beneficios : [];
-  const disponibles = beneficios.filter(b => b.estado === 'disponible');
-  const otros = beneficios.filter(b => b.estado !== 'disponible');
+  // Vigente = disponible y sin vencer (filtro en el cliente, sin costo extra).
+  const vigente = (b: (typeof beneficios)[number]) => !b.vence_en || new Date(b.vence_en).getTime() >= Date.now();
+  const disponibles = beneficios.filter(b => b.estado === 'disponible' && vigente(b));
+  const otros = beneficios.filter(b => !(b.estado === 'disponible' && vigente(b)));
 
   // Programa avisos locales de vencimiento cuando cargan los beneficios.
   useEffect(() => {
@@ -113,7 +115,7 @@ export function MisBeneficiosScreen() {
                   <Icon name={b.estado === 'canjeado' ? 'check' : 'alert'} size={20} color={colors.textSecondary} />
                   <View style={styles.flex}>
                     <AppText variant="body" color={colors.textSecondary} numberOfLines={1}>{b.beneficio?.nombre ?? '—'}</AppText>
-                    <AppText variant="caption" color={colors.textSecondary}>{b.negocio?.nombre ?? ''} · {ESTADO[b.estado] ?? b.estado}</AppText>
+                    <AppText variant="caption" color={colors.textSecondary}>{b.negocio?.nombre ?? ''} · {b.estado === 'disponible' && !vigente(b) ? 'Vencido' : (ESTADO[b.estado] ?? b.estado)}</AppText>
                   </View>
                   {b.estado === 'canjeado' && (
                     <Pressable onPress={() => navigation.navigate('Resena', { negocioId: b.negocio_id, nombre: b.negocio?.nombre ?? 'el negocio' })}>
